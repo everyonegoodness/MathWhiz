@@ -118,10 +118,14 @@ public class DrillGeneratorTest {
     public void numberRecognitionShowsNumeralAndAnswersWithWord() {
         Skill skill = CurriculumGuide.byId("G1-NUM-2");
         for (long seed = 1; seed <= 100; seed++) {
-            for (Question q : new DrillGenerator(new Random(seed)).generate(skill, 1, 100, 10, fruits())) {
+            List<Question> questions = new DrillGenerator(new Random(seed)).generate(skill, 1, 100, 30, fruits());
+            int previous = Integer.MIN_VALUE;
+            for (Question q : questions) {
                 int n = Integer.parseInt(q.visual);
                 assertTrue(n >= 1 && n <= 100);
+                assertTrue(previous == Integer.MIN_VALUE || Math.abs((long) n - previous) > 1);
                 assertEquals(NumberWords.of(n), q.options.get(q.correctIndex));
+                previous = n;
             }
         }
     }
@@ -168,7 +172,8 @@ public class DrillGeneratorTest {
     public void validateRangeRejectsBadInput() {
         Skill add = CurriculumGuide.byId("K-ADD-1");
         assertNull(DrillGenerator.validateRange(add, 1, 5));
-        assertNotNullMsg(DrillGenerator.validateRange(add, 1, 6));   // above the skill's range
+        assertNull(DrillGenerator.validateRange(add, 1, 10));
+        assertNotNullMsg(DrillGenerator.validateRange(add, 1, 11));  // above the skill's range
         assertNotNullMsg(DrillGenerator.validateRange(add, 1, 1));   // too small for addition
         Skill cmp = CurriculumGuide.byId("K-CMP-1");
         assertNotNullMsg(DrillGenerator.validateRange(cmp, 1, 3));   // needs 4 different numbers
@@ -179,7 +184,7 @@ public class DrillGeneratorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void generateThrowsOnInvalidRange() {
-        new DrillGenerator(new Random(1)).generate(CurriculumGuide.byId("K-ADD-1"), 1, 9, 5, fruits());
+        new DrillGenerator(new Random(1)).generate(CurriculumGuide.byId("K-ADD-1"), 1, 11, 5, fruits());
     }
 
     @Test
@@ -215,8 +220,15 @@ public class DrillGeneratorTest {
         Set<String> kinder = new HashSet<>();
         for (Skill s : CurriculumGuide.forGrade("Kinder")) kinder.add(s.id);
         for (Skill s : CurriculumGuide.forGrade("1")) assertFalse(kinder.contains(s.id));
-        assertTrue(CurriculumGuide.forGrade("Kinder").size() >= 5);
-        assertTrue(CurriculumGuide.forGrade("1").size() >= 5);
-        for (Skill s : CurriculumGuide.forGrade("Kinder")) assertTrue(s.maxNumber <= 10);
+        assertEquals(5, CurriculumGuide.forGrade("Kinder").size());
+        assertEquals(5, CurriculumGuide.forGrade("1").size());
+        Set<String> kinderTopics = new HashSet<>();
+        Set<String> gradeOneTopics = new HashSet<>();
+        for (Skill s : CurriculumGuide.forGrade("Kinder")) assertTrue(kinderTopics.add(s.topic));
+        for (Skill s : CurriculumGuide.forGrade("1")) assertTrue(gradeOneTopics.add(s.topic));
+        for (Skill s : CurriculumGuide.forGrade("Kinder")) {
+            assertTrue(s.maxNumber <= 10);
+            assertNull(DrillGenerator.validateRange(s, s.minNumber, 10));
+        }
     }
 }

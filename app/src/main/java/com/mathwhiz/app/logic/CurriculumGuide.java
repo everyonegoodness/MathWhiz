@@ -6,7 +6,9 @@ import com.mathwhiz.app.model.Topic;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Fixed per-level curriculum skill table.
@@ -28,8 +30,8 @@ public final class CurriculumGuide {
         s.add(new Skill("K-CNT-2", Grade.KINDER, Topic.COUNTING, "Count objects 1-10", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
         s.add(new Skill("K-NUM-1", Grade.KINDER, Topic.NUMBER_RECOGNITION, "Recognize numerals 1-10", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
         s.add(new Skill("K-CMP-1", Grade.KINDER, Topic.COMPARING, "Which group has more or fewer (up to 10)", 1, 10, Skill.STYLE_GROUPS, PLACEHOLDER));
-        s.add(new Skill("K-ADD-1", Grade.KINDER, Topic.ADDITION, "Join groups, sums up to 5", 1, 5, Skill.STYLE_NONE, PLACEHOLDER));
-        s.add(new Skill("K-SUB-1", Grade.KINDER, Topic.SUBTRACTION, "Take away, from up to 5", 1, 5, Skill.STYLE_NONE, PLACEHOLDER));
+        s.add(new Skill("K-ADD-1", Grade.KINDER, Topic.ADDITION, "Join groups", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
+        s.add(new Skill("K-SUB-1", Grade.KINDER, Topic.SUBTRACTION, "Take away", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
         // ---- Grade 1 ----
         s.add(new Skill("G1-CNT-1", Grade.GRADE_1, Topic.COUNTING, "Count objects up to 20", 1, 20, Skill.STYLE_NONE, PLACEHOLDER));
         s.add(new Skill("G1-NUM-1", Grade.GRADE_1, Topic.NUMBER_RECOGNITION, "Recognize numerals up to 20", 1, 20, Skill.STYLE_NONE, PLACEHOLDER));
@@ -48,9 +50,16 @@ public final class CurriculumGuide {
     public static List<Skill> all() { return SKILLS; }
 
     public static List<Skill> forGrade(String grade) {
-        List<Skill> out = new ArrayList<>();
-        for (Skill s : SKILLS) if (s.grade.equals(grade)) out.add(s);
-        return out;
+        Map<String, Skill> byTopic = new LinkedHashMap<>();
+        for (Skill skill : SKILLS) {
+            if (!skill.grade.equals(grade)) continue;
+            Skill current = byTopic.get(skill.topic);
+            // Keep one picker entry per topic, using the widest range available for that grade.
+            if (current == null || skill.maxNumber > current.maxNumber) {
+                byTopic.put(skill.topic, skill);
+            }
+        }
+        return new ArrayList<>(byTopic.values());
     }
 
     public static Skill byId(String id) {

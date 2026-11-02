@@ -23,9 +23,9 @@
         <activity android:name=".ui.CreateDrillActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.DrillListActivity" android:exported="false" />
-        <!-- Class mode is landscape-only for TV/projector use and survives rotation without restarting the drill. -->
+        <!-- Adapt to phone and tablet orientations without restarting the current drill. -->
         <activity android:name=".ui.ClassModeActivity" android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="fullSensor"
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".ui.ResultsActivity" android:exported="false" />
         <activity android:name=".ui.DashboardActivity" android:exported="false" />

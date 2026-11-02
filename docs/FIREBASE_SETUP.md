@@ -5,7 +5,7 @@
 4. **Build ▸ Realtime Database ▸ Create database** (choose the region nearest you; start in locked mode).
    If your region is not US, re-download `google-services.json` after creating the database so it contains `firebase_url`.
 5. **Realtime Database ▸ Rules**: paste the contents of `database.rules.json` → **Publish**.
-6. Run the app → Register → Home → "Load demo data" → Dashboard. In the console, confirm `users/`, `sessions/`, `responses/` appear.
+6. Run the app → Register → create and run a drill → Dashboard. In the console, confirm `users/`, `sessions/`, `responses/` appear.
 
 ## Data structure
 ```

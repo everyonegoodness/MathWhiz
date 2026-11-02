@@ -1,11 +1,13 @@
 package com.mathwhiz.app.ui;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -27,26 +29,39 @@ import com.mathwhiz.app.model.SessionResult;
 import com.mathwhiz.app.model.Topic;
 
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /** Class dashboard: accuracy by topic and skill, most-missed types, session history; filter by grade and section. */
 public class DashboardActivity extends AppCompatActivity {
     private static final String[] GRADE_LABELS = {"All grades", "Kindergarten", "Grade 1"};
     private static final String[] GRADE_VALUES = {"", Grade.KINDER, Grade.GRADE_1};
+    private static final String[] DATE_RANGE_LABELS = {"All time", "Today", "This month", "Custom range"};
+    private static final int DATE_ALL_TIME = 0;
+    private static final int DATE_TODAY = 1;
+    private static final int DATE_THIS_MONTH = 2;
+    private static final int DATE_CUSTOM = 3;
 
-    private Spinner spGrade, spSection;
+    private Spinner spGrade, spSection, spDateRange;
     private ProgressBar progress;
     private TextView tvError, tvEmpty, tvOverall;
+    private Button btnViewAllQuestions, btnViewAllHistory;
     private View content;
     private LinearLayout topicList, skillList, missedList, questionList, historyList;
 
     private SessionRepository.Data data;
     private List<String> sectionValues = new ArrayList<>();
     private boolean ready;
+    private boolean showAllQuestions;
+    private boolean showAllHistory;
+    private int selectedDateRange = DATE_ALL_TIME;
+    private int previousDateRange = DATE_ALL_TIME;
+    private long customRangeStart;
+    private long customRangeEnd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +69,13 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
         spGrade = findViewById(R.id.spGrade);
         spSection = findViewById(R.id.spSection);
+        spDateRange = findViewById(R.id.spDateRange);
         progress = findViewById(R.id.progress);
         tvError = findViewById(R.id.tvError);
         tvEmpty = findViewById(R.id.tvEmpty);
         tvOverall = findViewById(R.id.tvOverall);
+        btnViewAllQuestions = findViewById(R.id.btnViewAllQuestions);
+        btnViewAllHistory = findViewById(R.id.btnViewAllHistory);
         content = findViewById(R.id.content);
         topicList = findViewById(R.id.topicList);
         skillList = findViewById(R.id.skillList);
@@ -66,11 +84,50 @@ public class DashboardActivity extends AppCompatActivity {
         historyList = findViewById(R.id.historyList);
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         findViewById(R.id.btnRetry).setOnClickListener(v -> load());
+        btnViewAllQuestions.setOnClickListener(v -> {
+            showAllQuestions = !showAllQuestions;
+            render();
+        });
+        btnViewAllHistory.setOnClickListener(v -> {
+            showAllHistory = !showAllHistory;
+            render();
+        });
 
         ArrayAdapter<String> ga = new ArrayAdapter<>(this, R.layout.item_spinner, GRADE_LABELS);
         ga.setDropDownViewResource(R.layout.item_spinner);
         spGrade.setAdapter(ga);
-        AdapterView.OnItemSelectedListener rerender = new AdapterView.OnItemSelectedListener() {
+        ArrayAdapter<String> da = new ArrayAdapter<>(this, R.layout.item_spinner, DATE_RANGE_LABELS);
+        da.setDropDownViewResource(R.layout.item_spinner);
+        spDateRange.setAdapter(da);
+        spDateRange.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!ready || position == selectedDateRange) return;
+                if (position == DATE_CUSTOM) {
+                    showCustomDateRange();
+                } else {
+                    previousDateRange = selectedDateRange;
+                    selectedDateRange = position;
+                    render();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+        spGrade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (ready) {
+                    setupSectionFilter();
+                    render();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+        spSection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (ready) render();
@@ -78,9 +135,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
-        };
-        spGrade.setOnItemSelectedListener(rerender);
-        spSection.setOnItemSelectedListener(rerender);
+        });
     }
 
     @Override
@@ -122,32 +177,131 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void setupSectionFilter() {
-        Set<String> sections = new LinkedHashSet<>();
-        for (SessionResult s : data.sessions) if (s.section != null && !s.section.isEmpty()) sections.add(s.section);
+        String selectedGrade = selectedGrade();
+        Map<String, String> sections = new LinkedHashMap<>();
+        for (SessionResult session : data.sessions) {
+            if (session.section == null || session.section.isEmpty()) continue;
+            if (!selectedGrade.isEmpty() && !selectedGrade.equals(session.grade)) continue;
+            sections.put(session.section, sectionLabel(session));
+        }
         sectionValues = new ArrayList<>();
         sectionValues.add("");
-        sectionValues.addAll(sections);
+        sectionValues.addAll(sections.keySet());
         List<String> labels = new ArrayList<>();
         labels.add("All sections");
-        labels.addAll(sections);
+        labels.addAll(sections.values());
         ArrayAdapter<String> sa = new ArrayAdapter<>(this, R.layout.item_spinner, labels);
         sa.setDropDownViewResource(R.layout.item_spinner);
         spSection.setAdapter(sa);
     }
 
+    private String selectedGrade() {
+        int position = spGrade.getSelectedItemPosition();
+        return position >= 0 && position < GRADE_VALUES.length ? GRADE_VALUES[position] : "";
+    }
+
+    private String sectionLabel(SessionResult session) {
+        String section = session.section.trim();
+        String prefix = Grade.label(session.grade) + " - ";
+        return section.startsWith(prefix) ? section.substring(prefix.length()).trim() : section;
+    }
+
+    private void showCustomDateRange() {
+        Calendar today = Calendar.getInstance();
+        Calendar initialStart = Calendar.getInstance();
+        Calendar initialEnd = Calendar.getInstance();
+        if (customRangeEnd > customRangeStart) {
+            initialStart.setTimeInMillis(customRangeStart);
+            initialEnd.setTimeInMillis(customRangeEnd - 1);
+        } else {
+            initialStart.set(Calendar.DAY_OF_MONTH, 1);
+            initialEnd.setTimeInMillis(today.getTimeInMillis());
+        }
+
+        DatePickerDialog startPicker = new DatePickerDialog(this,
+                (picker, year, month, day) -> {
+                    Calendar start = dayStart(year, month, day);
+                    showEndDatePicker(start, initialEnd);
+                },
+                initialStart.get(Calendar.YEAR), initialStart.get(Calendar.MONTH),
+                initialStart.get(Calendar.DAY_OF_MONTH));
+        startPicker.setOnCancelListener(dialog -> restoreDateRangeSelection());
+        startPicker.show();
+    }
+
+    private void showEndDatePicker(Calendar start, Calendar initialEnd) {
+        Calendar endSelection = (Calendar) initialEnd.clone();
+        if (endSelection.before(start)) endSelection = (Calendar) start.clone();
+        DatePickerDialog endPicker = new DatePickerDialog(this,
+                (picker, year, month, day) -> {
+                    Calendar end = dayStart(year, month, day);
+                    Calendar endExclusive = (Calendar) end.clone();
+                    endExclusive.add(Calendar.DAY_OF_MONTH, 1);
+                    customRangeStart = start.getTimeInMillis();
+                    customRangeEnd = endExclusive.getTimeInMillis();
+                    previousDateRange = selectedDateRange;
+                    selectedDateRange = DATE_CUSTOM;
+                    render();
+                },
+                endSelection.get(Calendar.YEAR), endSelection.get(Calendar.MONTH),
+                endSelection.get(Calendar.DAY_OF_MONTH));
+        endPicker.getDatePicker().setMinDate(start.getTimeInMillis());
+        endPicker.setOnCancelListener(dialog -> restoreDateRangeSelection());
+        endPicker.show();
+    }
+
+    private Calendar dayStart(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(year, month, day);
+        return calendar;
+    }
+
+    private void restoreDateRangeSelection() {
+        spDateRange.setSelection(previousDateRange);
+    }
+
+    private long[] selectedDateBounds() {
+        Calendar start = Calendar.getInstance();
+        Calendar end = Calendar.getInstance();
+        if (selectedDateRange == DATE_TODAY) {
+            start.set(Calendar.HOUR_OF_DAY, 0);
+            start.set(Calendar.MINUTE, 0);
+            start.set(Calendar.SECOND, 0);
+            start.set(Calendar.MILLISECOND, 0);
+            end.setTimeInMillis(start.getTimeInMillis());
+            end.add(Calendar.DAY_OF_MONTH, 1);
+            return new long[]{start.getTimeInMillis(), end.getTimeInMillis()};
+        }
+        if (selectedDateRange == DATE_THIS_MONTH) {
+            start.set(Calendar.DAY_OF_MONTH, 1);
+            start.set(Calendar.HOUR_OF_DAY, 0);
+            start.set(Calendar.MINUTE, 0);
+            start.set(Calendar.SECOND, 0);
+            start.set(Calendar.MILLISECOND, 0);
+            end.setTimeInMillis(start.getTimeInMillis());
+            end.add(Calendar.MONTH, 1);
+            return new long[]{start.getTimeInMillis(), end.getTimeInMillis()};
+        }
+        if (selectedDateRange == DATE_CUSTOM) return new long[]{customRangeStart, customRangeEnd};
+        return new long[]{Long.MIN_VALUE, Long.MAX_VALUE};
+    }
+
     private void render() {
-        String grade = GRADE_VALUES[spGrade.getSelectedItemPosition()];
+        String grade = selectedGrade();
         int sp = spSection.getSelectedItemPosition();
         String section = sp >= 0 && sp < sectionValues.size() ? sectionValues.get(sp) : "";
 
         List<SessionResult> sessions = StatsAggregator.filterSessions(data.sessions, grade, section);
-        List<ResponseRecord> responses = StatsAggregator.filterResponses(data.responses, grade, section);
+        long[] dateBounds = selectedDateBounds();
+        sessions = StatsAggregator.filterSessionsByDateRange(sessions, dateBounds[0], dateBounds[1]);
+        List<ResponseRecord> responses = StatsAggregator.filterResponsesForSessions(data.responses, sessions);
 
         boolean empty = sessions.isEmpty() && responses.isEmpty();
         UiUtils.show(tvEmpty, empty);
         UiUtils.show(content, !empty);
         if (data.sessions.isEmpty()) {
-            tvEmpty.setText("No sessions yet. Run a drill in class mode, or tap \"Load demo data\" on the home screen.");
+            tvEmpty.setText("No sessions yet. Run a drill in class mode to see your class results here.");
         } else {
             tvEmpty.setText("No sessions match these filters.");
         }
@@ -170,21 +324,47 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         questionList.removeAllViews();
-        List<StatsAggregator.MissedQuestion> mq = StatsAggregator.missedQuestions(responses, 8);
+        List<StatsAggregator.MissedQuestion> mq = StatsAggregator.missedQuestions(responses, responses.size());
         if (mq.isEmpty()) addRow(questionList, "No missed questions.", "", null);
-        for (final StatsAggregator.MissedQuestion m : mq) {
+        int questionCount = showAllQuestions ? mq.size() : Math.min(2, mq.size());
+        for (int i = 0; i < questionCount; i++) {
+            final StatsAggregator.MissedQuestion m = mq.get(i);
             View.OnClickListener click = null;
             if (m.fruit != null && !m.fruit.isEmpty()) click = v -> showFact(m.fruit);
             addRow(questionList, m.question, Topic.label(m.topic) + "  \u2022  missed " + m.count + "x", click);
         }
+        updateViewAllButton(btnViewAllQuestions, mq.size(), showAllQuestions);
 
         historyList.removeAllViews();
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-        for (SessionResult s : sessions) {
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+        String currentHistoryDate = null;
+        int historyCount = showAllHistory ? sessions.size() : Math.min(2, sessions.size());
+        for (int i = 0; i < historyCount; i++) {
+            SessionResult s = sessions.get(i);
+            String sessionDate = dateFormat.format(new Date(s.date));
+            if (!sessionDate.equals(currentHistoryDate)) {
+                addHistoryDateHeading(sessionDate);
+                currentHistoryDate = sessionDate;
+            }
             int pct = s.totalQuestions == 0 ? 0 : (int) Math.round(100.0 * s.totalCorrect / s.totalQuestions);
             addRow(historyList, s.title + "  \u2014  " + s.totalCorrect + "/" + s.totalQuestions + " (" + pct + "%)",
-                    df.format(new Date(s.date)) + "  \u2022  " + s.section, null);
+                    timeFormat.format(new Date(s.date)) + "  \u2022  " + s.section, null);
         }
+        updateViewAllButton(btnViewAllHistory, sessions.size(), showAllHistory);
+    }
+
+    private void addHistoryDateHeading(String label) {
+        TextView heading = new TextView(this);
+        heading.setText(label);
+        heading.setTextAppearance(this, R.style.Text_Heading);
+        historyList.addView(heading);
+    }
+
+    private void updateViewAllButton(Button button, int total, boolean expanded) {
+        boolean canExpand = total > 2;
+        UiUtils.show(button, canExpand);
+        if (canExpand) button.setText(expanded ? "Show less" : "View all (" + total + ")");
     }
 
     private void addStat(LinearLayout parent, StatsAggregator.Stat s) {

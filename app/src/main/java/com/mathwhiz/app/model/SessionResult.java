@@ -2,6 +2,7 @@ package com.mathwhiz.app.model;
 
 /** Saved under sessions/{sessionId}. Class-level totals only: no per-student scores. */
 public class SessionResult {
+    public String sessionId = "";
     public String teacherUid = "";
     public String drillId = "";
     public String title = "";

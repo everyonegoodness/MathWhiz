@@ -16,7 +16,7 @@ Java • XML layouts • Activities + Repository classes • Firebase Auth + Rea
 Teacher register/login • Home • Drill setup (grade, section, skill, count, flashcard / multiple choice, timed / untimed) •
 Class mode (Reveal → Correct/Wrong → Next; or tap A–D) • Right/wrong feedback with icon + color • Class score + streak •
 Results + Fruityvice fun fact (offline fallback) • Dashboard (grade/section filters, accuracy by topic and skill,
-most-missed types, missed questions, session history) • "Load demo data (fake)" button.
+most-missed types, missed questions, session history).
 Not included (not chosen for this build): teacher notes, Fruit of the Day, delete/edit drills.
 
 ## Open and run
@@ -32,7 +32,7 @@ Never commit `google-services.json` (already in `.gitignore`).
 ```
 app/src/main/java/com/mathwhiz/app/
   model/   Drill, SessionResult, ResponseRecord, Skill, Question, Fruit, FruitDto ...  (plain Java, no Android)
-  logic/   DrillGenerator, CurriculumGuide, SessionTracker, StatsAggregator, FruitCatalog, FruitFacts, DemoData, Validators
+  logic/   DrillGenerator, CurriculumGuide, SessionTracker, StatsAggregator, FruitCatalog, FruitFacts, Validators
   data/    AuthRepository, DrillRepository, SessionRepository, FruitRepository, FruityviceApi  (Firebase + Retrofit)
   ui/      Login, Register, Home, CreateDrill, DrillList, ClassMode, Results, Dashboard
 app/src/main/res/  layout/ values/(colors, styles, strings) drawable/

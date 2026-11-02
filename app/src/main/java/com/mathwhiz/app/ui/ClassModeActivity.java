@@ -10,6 +10,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -60,6 +61,7 @@ public class ClassModeActivity extends AppCompatActivity {
     private CountDownTimer timer;
 
     private View startPanel, feedbackPanel, rowMark, mcGrid;
+    private ScrollView questionScroll;
     private TextView tvStartTitle, tvStartInfo, tvFruitStatus;
     private TextView tvProgress, tvStreak, tvTimer, tvScore, tvPrompt, tvVisual, tvAnswer, tvFeedback;
     private Button btnStart, btnReveal, btnCorrect, btnWrong, btnNext;
@@ -105,6 +107,7 @@ public class ClassModeActivity extends AppCompatActivity {
         feedbackPanel = findViewById(R.id.feedbackPanel);
         rowMark = findViewById(R.id.rowMark);
         mcGrid = findViewById(R.id.mcGrid);
+        questionScroll = findViewById(R.id.questionScroll);
         tvStartTitle = findViewById(R.id.tvStartTitle);
         tvStartInfo = findViewById(R.id.tvStartInfo);
         tvFruitStatus = findViewById(R.id.tvFruitStatus);
@@ -168,6 +171,7 @@ public class ClassModeActivity extends AppCompatActivity {
 
     private void showQuestion(int i) {
         index = i;
+        questionScroll.post(() -> questionScroll.scrollTo(0, 0));
         Question q = questions.get(i);
         boolean mc = drill.formatIsMultipleChoice();
 

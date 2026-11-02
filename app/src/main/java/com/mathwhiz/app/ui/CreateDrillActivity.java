@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.mathwhiz.app.R;
@@ -32,16 +33,18 @@ import java.util.List;
 public class CreateDrillActivity extends AppCompatActivity {
     private static final String[] GRADE_LABELS = {"Kindergarten", "Grade 1"};
     private static final String[] GRADE_VALUES = {Grade.KINDER, Grade.GRADE_1};
-    private static final String[] FORMAT_LABELS = {"Flashcard (Reveal, then Correct / Wrong)", "Multiple choice (tap the called option)"};
+    private static final String[] FORMAT_LABELS = {"Flashcard", "Multiple choice"};
     private static final String[] MODE_LABELS = {"Untimed", "Timed"};
 
     private Spinner spGrade, spSkill, spFormat, spMode;
     private EditText etSection, etMax, etCount, etTime, etTitle;
-    private TextView tvSkillInfo, tvError;
+    private TextView tvError;
     private View timeRow;
     private Button btnSave;
     private ProgressBar progress;
     private final List<Skill> skills = new ArrayList<>();
+    private Drill editingDrill;
+    private String editingDrillId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +59,6 @@ public class CreateDrillActivity extends AppCompatActivity {
         etCount = findViewById(R.id.etCount);
         etTime = findViewById(R.id.etTime);
         etTitle = findViewById(R.id.etTitle);
-        tvSkillInfo = findViewById(R.id.tvSkillInfo);
         tvError = findViewById(R.id.tvError);
         timeRow = findViewById(R.id.timeRow);
         btnSave = findViewById(R.id.btnSave);
@@ -65,21 +67,22 @@ public class CreateDrillActivity extends AppCompatActivity {
         spGrade.setAdapter(adapter(GRADE_LABELS));
         spFormat.setAdapter(adapter(FORMAT_LABELS));
         spMode.setAdapter(adapter(MODE_LABELS));
-        etCount.setText("10");
-        etTime.setText("20");
 
         spGrade.setOnItemSelectedListener(new SimpleSelect() {
             @Override
             void onChosen(int position) { loadSkillsFor(GRADE_VALUES[position]); }
         });
-        spSkill.setOnItemSelectedListener(new SimpleSelect() {
-            @Override
-            void onChosen(int position) { showSkill(skills.get(position)); }
-        });
         spMode.setOnItemSelectedListener(new SimpleSelect() {
             @Override
             void onChosen(int position) { UiUtils.show(timeRow, position == 1); }
         });
+        if (getIntent().hasExtra(IntentKeys.DRILL)) {
+            initializeFromDrill();
+        } else {
+            etMax.setText("10");
+            etCount.setText("10");
+            etTime.setText("20");
+        }
         btnSave.setOnClickListener(v -> save());
     }
 
@@ -94,14 +97,43 @@ public class CreateDrillActivity extends AppCompatActivity {
         skills.clear();
         skills.addAll(CurriculumGuide.forGrade(grade));
         List<String> titles = new ArrayList<>();
-        for (Skill s : skills) titles.add(Topic.label(s.topic) + ": " + s.title);
+        for (Skill s : skills) titles.add(Topic.label(s.topic));
         spSkill.setAdapter(adapter(titles.toArray(new String[0])));
-        if (!skills.isEmpty()) showSkill(skills.get(0));
     }
 
-    private void showSkill(Skill s) {
-        tvSkillInfo.setText("Numbers " + s.minNumber + " to " + s.maxNumber + "\nSource: " + s.sourceRef);
-        etMax.setText(String.valueOf(s.maxNumber));
+    @SuppressWarnings("deprecation")
+    private void initializeFromDrill() {
+        editingDrill = (Drill) getIntent().getSerializableExtra(IntentKeys.DRILL);
+        editingDrillId = getIntent().getStringExtra(IntentKeys.DRILL_ID);
+        if (editingDrill == null || editingDrillId == null) {
+            UiUtils.showError(tvError, "This saved drill could not be edited.");
+            finish();
+            return;
+        }
+        int gradePosition = Grade.GRADE_1.equals(editingDrill.grade) ? 1 : 0;
+        spGrade.setSelection(gradePosition);
+        loadSkillsFor(editingDrill.grade);
+        for (int i = 0; i < skills.size(); i++) {
+            if (skills.get(i).topic.equals(editingDrill.topic)) {
+                spSkill.setSelection(i);
+                break;
+            }
+        }
+        spFormat.setSelection(Drill.FORMAT_MULTIPLE_CHOICE.equals(editingDrill.format) ? 1 : 0);
+        spMode.setSelection(Drill.MODE_TIMED.equals(editingDrill.mode) ? 1 : 0);
+        etSection.setText(sectionName(editingDrill));
+        etMax.setText(String.valueOf(editingDrill.maxNumber));
+        etCount.setText(String.valueOf(editingDrill.questionCount));
+        etTime.setText(String.valueOf(editingDrill.timeLimitSec > 0 ? editingDrill.timeLimitSec : 20));
+        etTitle.setText(editingDrill.title);
+        btnSave.setText("Save changes");
+        ((TextView) findViewById(R.id.tvCreateTitle)).setText("Edit drill");
+    }
+
+    private String sectionName(Drill drill) {
+        String section = drill.section == null ? "" : drill.section.trim();
+        String prefix = Grade.label(drill.grade) + " - ";
+        return section.startsWith(prefix) ? section.substring(prefix.length()).trim() : section;
     }
 
     private void save() {
@@ -144,34 +176,80 @@ public class CreateDrillActivity extends AppCompatActivity {
         d.format = spFormat.getSelectedItemPosition() == 1 ? Drill.FORMAT_MULTIPLE_CHOICE : Drill.FORMAT_FLASHCARD;
         d.mode = timed ? Drill.MODE_TIMED : Drill.MODE_UNTIMED;
         d.timeLimitSec = timed ? Validators.parseInt(etTime.getText().toString()) : 0;
-        d.createdAt = System.currentTimeMillis();
+        d.createdAt = editingDrill == null ? System.currentTimeMillis() : editingDrill.createdAt;
 
-        UiUtils.show(progress, true);
-        btnSave.setEnabled(false);
-        final android.content.Context appCtx = getApplicationContext();
-        DrillRepository.get().saveDrill(d, new DataCallback<DrillRepository.Entry>() {
+        if (editingDrill == null) {
+            saveNewDrill(d, true);
+        } else {
+            chooseEditSaveAction(d);
+        }
+    }
+
+    private void chooseEditSaveAction(Drill drill) {
+        String[] options = {"Replace original", "Make a copy", "Cancel"};
+        new AlertDialog.Builder(this)
+                .setTitle("Save changes")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) replaceDrill(drill);
+                    else if (which == 1) saveEditedCopy(drill);
+                })
+                .show();
+    }
+
+    private void replaceDrill(Drill drill) {
+        setSaving(true);
+        DrillRepository.get().updateDrill(editingDrillId, drill, new DataCallback<Void>() {
+            @Override
+            public void onSuccess(Void value) { finish(); }
+
+            @Override
+            public void onError(String message) { showSaveError(message); }
+        });
+    }
+
+    private void saveEditedCopy(Drill drill) {
+        drill.title = copyTitle(drill.title);
+        drill.createdAt = System.currentTimeMillis();
+        saveNewDrill(drill, false);
+    }
+
+    private String copyTitle(String title) {
+        String prefix = "Copy of ";
+        String original = title == null ? "" : title;
+        int maxOriginalLength = 80 - prefix.length();
+        if (original.length() > maxOriginalLength) original = original.substring(0, maxOriginalLength);
+        return prefix + original;
+    }
+
+    private void saveNewDrill(Drill drill, boolean startClassMode) {
+        setSaving(true);
+        DrillRepository.get().saveDrill(drill, new DataCallback<DrillRepository.Entry>() {
             @Override
             public void onSuccess(DrillRepository.Entry entry) {
-                Intent i = new Intent(CreateDrillActivity.this, ClassModeActivity.class);
-                i.putExtra(IntentKeys.DRILL, entry.drill);
-                i.putExtra(IntentKeys.DRILL_ID, entry.id);
-                startActivity(i);
+                if (startClassMode) {
+                    Intent i = new Intent(CreateDrillActivity.this, ClassModeActivity.class);
+                    i.putExtra(IntentKeys.DRILL, entry.drill);
+                    i.putExtra(IntentKeys.DRILL_ID, entry.id);
+                    startActivity(i);
+                } else {
+                    UiUtils.toast(CreateDrillActivity.this, "Drill copied.");
+                }
                 finish();
             }
 
             @Override
-            public void onError(String message) {
-                UiUtils.show(progress, false);
-                btnSave.setEnabled(true);
-                UiUtils.showError(tvError, message);
-            }
-        }, new DataCallback<Void>() {
-            @Override
-            public void onSuccess(Void value) { }
-
-            @Override
-            public void onError(String message) { UiUtils.toast(appCtx, message); }
+            public void onError(String message) { showSaveError(message); }
         });
+    }
+
+    private void setSaving(boolean saving) {
+        UiUtils.show(progress, saving);
+        btnSave.setEnabled(!saving);
+    }
+
+    private void showSaveError(String message) {
+        setSaving(false);
+        UiUtils.showError(tvError, message);
     }
 
     /** Spinner listener that only needs the chosen position. */

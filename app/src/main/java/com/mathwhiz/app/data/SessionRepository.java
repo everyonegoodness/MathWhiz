@@ -41,14 +41,51 @@ public final class SessionRepository {
         DatabaseReference root = root();
         String sessionId = root.child("sessions").push().getKey();
         Map<String, Object> updates = new HashMap<>();
-        updates.put("sessions/" + sessionId, session);
+        updates.put("sessions/" + sessionId, sessionValues(session));
         for (ResponseRecord r : responses) {
             r.sessionId = sessionId;
             String key = root.child("responses").push().getKey();
-            updates.put("responses/" + key, r);
+            updates.put("responses/" + key, responseValues(r));
         }
         root.updateChildren(updates).addOnFailureListener(e ->
                 onRejected.onError("Results could not be saved to the server: " + e.getMessage()));
+    }
+
+    private Map<String, Object> sessionValues(SessionResult session) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("teacherUid", session.teacherUid);
+        values.put("drillId", session.drillId);
+        values.put("title", session.title);
+        values.put("grade", session.grade);
+        values.put("section", session.section);
+        values.put("skillId", session.skillId);
+        values.put("topic", session.topic);
+        values.put("format", session.format);
+        values.put("mode", session.mode);
+        values.put("date", session.date);
+        values.put("totalCorrect", session.totalCorrect);
+        values.put("totalQuestions", session.totalQuestions);
+        values.put("bestStreak", session.bestStreak);
+        return values;
+    }
+
+    private Map<String, Object> responseValues(ResponseRecord response) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("sessionId", response.sessionId);
+        values.put("teacherUid", response.teacherUid);
+        values.put("grade", response.grade);
+        values.put("section", response.section);
+        values.put("skillId", response.skillId);
+        values.put("topic", response.topic);
+        values.put("fruit", response.fruit);
+        values.put("question", response.question);
+        values.put("correctAnswer", response.correctAnswer);
+        values.put("chosenOption", response.chosenOption);
+        values.put("correct", response.correct);
+        values.put("timedOut", response.timedOut);
+        values.put("timeSec", response.timeSec);
+        values.put("timestamp", response.timestamp);
+        return values;
     }
 
     public void loadAll(final String teacherUid, final DataCallback<Data> cb) {
@@ -59,7 +96,10 @@ public final class SessionRepository {
                         final List<SessionResult> sessions = new ArrayList<>();
                         for (DataSnapshot c : sSnap.getChildren()) {
                             SessionResult s = c.getValue(SessionResult.class);
-                            if (s != null) sessions.add(s);
+                            if (s != null) {
+                                s.sessionId = c.getKey();
+                                sessions.add(s);
+                            }
                         }
                         FirebaseReads.readOnce(root().child("responses").orderByChild("teacherUid").equalTo(teacherUid),
                                 new DataCallback<DataSnapshot>() {

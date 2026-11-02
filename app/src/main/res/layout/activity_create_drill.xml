@@ -11,6 +11,7 @@
         android:padding="24dp">
 
         <TextView
+            android:id="@+id/tvCreateTitle"
             style="@style/Text.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,14 +55,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_card" />
-
-        <TextView
-            android:id="@+id/tvSkillInfo"
-            style="@style/Text.Body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

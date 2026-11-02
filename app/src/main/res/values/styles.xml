@@ -26,24 +26,24 @@
     <style name="Widget.MathWhiz.Button.Blue"><item name="backgroundTint">@color/mw_blue</item></style>
     <!-- Compact class-mode variants (60dp tall) -->
     <style name="Widget.MathWhiz.Button.Orange.Class" parent="Widget.MathWhiz.Button.Orange">
-        <item name="android:minHeight">60dp</item>
-        <item name="android:textSize">24sp</item>
-        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginTop">2dp</item>
     </style>
     <style name="Widget.MathWhiz.Button.Green.Class" parent="Widget.MathWhiz.Button.Green">
-        <item name="android:minHeight">60dp</item>
-        <item name="android:textSize">24sp</item>
-        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginTop">2dp</item>
     </style>
     <style name="Widget.MathWhiz.Button.Red.Class" parent="Widget.MathWhiz.Button.Red">
-        <item name="android:minHeight">60dp</item>
-        <item name="android:textSize">24sp</item>
-        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginTop">2dp</item>
     </style>
     <style name="Widget.MathWhiz.Button.Blue.Class" parent="Widget.MathWhiz.Button.Blue">
-        <item name="android:minHeight">60dp</item>
-        <item name="android:textSize">22sp</item>
-        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_marginTop">2dp</item>
     </style>
     <style name="Widget.MathWhiz.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textSize">18sp</item>

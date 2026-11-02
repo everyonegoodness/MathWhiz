@@ -58,23 +58,27 @@ public class DrillGenerator {
         List<Fruit> pool = buildPool(fruits);
         List<Question> out = new ArrayList<>();
         Set<String> seen = new HashSet<>();
+        int previousRecognitionNumber = Integer.MIN_VALUE;
         for (int i = 0; i < count; i++) {
             Question q = null;
             for (int attempt = 0; attempt < 30; attempt++) {   // avoid repeats when the range allows it
-                q = make(skill, min, max, pool);
+                q = make(skill, min, max, pool, previousRecognitionNumber);
                 if (seen.add(q.prompt + "|" + q.visual + "|" + q.options)) break;
             }
             out.add(q);
+            if (Topic.NUMBER_RECOGNITION.equals(skill.topic)) {
+                previousRecognitionNumber = Integer.parseInt(q.visual);
+            }
         }
         return out;
     }
 
     // ---------------------------------------------------------------- question builders
 
-    private Question make(Skill s, int min, int max, List<Fruit> pool) {
+    private Question make(Skill s, int min, int max, List<Fruit> pool, int previousRecognitionNumber) {
         switch (s.topic) {
             case Topic.COUNTING: return counting(s, min, max, pick(pool));
-            case Topic.NUMBER_RECOGNITION: return numberRecognition(s, min, max);
+            case Topic.NUMBER_RECOGNITION: return numberRecognition(s, min, max, previousRecognitionNumber);
             case Topic.COMPARING: return comparing(s, min, max, pool);
             case Topic.ADDITION: return addition(s, min, max, pick(pool));
             case Topic.SUBTRACTION: return subtraction(s, min, max, pick(pool));
@@ -87,8 +91,14 @@ public class DrillGenerator {
         return numeric(s, f.name, "How many " + f.plural() + " do you see?", rows(f.emoji, n), n, 1, s.maxNumber);
     }
 
-    private Question numberRecognition(Skill s, int min, int max) {
-        int n = between(min, max);
+    private Question numberRecognition(Skill s, int min, int max, int previousNumber) {
+        List<Integer> candidates = new ArrayList<>();
+        for (int value = min; value <= max; value++) {
+            if (previousNumber == Integer.MIN_VALUE || Math.abs((long) value - previousNumber) > 1) {
+                candidates.add(value);
+            }
+        }
+        int n = candidates.isEmpty() ? between(min, max) : candidates.get(rnd.nextInt(candidates.size()));
         List<Integer> wrong = wrongNumbers(n, 1, s.maxNumber, true);
         List<String> opts = new ArrayList<>();
         opts.add(NumberWords.of(n));

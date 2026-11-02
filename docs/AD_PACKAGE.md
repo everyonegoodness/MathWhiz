@@ -4,7 +4,7 @@
 Anything that fails testing must be cut from the script. Nothing here mentions student accounts, scores per pupil, or features not in the app.
 
 ## Setup
-Use a phone or emulator in **landscape**, screen recording 1080p, 30 fps. Run **Load demo data (fake)** first so the dashboard is full. Use a Wi-Fi connection so the Fruityvice fact is real. Don't show real pupil names (the app has none).
+Use a phone or emulator in **landscape**, screen recording 1080p, 30 fps. Run a practice drill first so the dashboard has class results to show. Use a Wi-Fi connection so the Fruityvice fact is real. Don't show real pupil names (the app has none).
 
 ## Timed storyboard
 | Time | Screen to record (real app) | Narration | On-screen text |

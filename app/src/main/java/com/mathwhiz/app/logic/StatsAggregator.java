@@ -2,7 +2,6 @@ package com.mathwhiz.app.logic;
 
 import com.mathwhiz.app.model.ResponseRecord;
 import com.mathwhiz.app.model.SessionResult;
-import com.mathwhiz.app.model.Skill;
 import com.mathwhiz.app.model.Topic;
 
 import java.util.ArrayList;
@@ -70,6 +69,37 @@ public final class StatsAggregator {
         return out;
     }
 
+    public static List<SessionResult> filterSessionsByDateRange(List<SessionResult> all,
+                                                                  long startInclusive,
+                                                                  long endExclusive) {
+        List<SessionResult> out = new ArrayList<>();
+        for (SessionResult session : all) {
+            if (session.date >= startInclusive && session.date < endExclusive) out.add(session);
+        }
+        Collections.sort(out, new Comparator<SessionResult>() {
+            @Override
+            public int compare(SessionResult a, SessionResult b) {
+                return Long.compare(b.date, a.date);
+            }
+        });
+        return out;
+    }
+
+    public static List<ResponseRecord> filterResponsesForSessions(List<ResponseRecord> responses,
+                                                                   List<SessionResult> sessions) {
+        Map<String, Boolean> sessionIds = new LinkedHashMap<>();
+        for (SessionResult session : sessions) {
+            if (session.sessionId != null && !session.sessionId.isEmpty()) {
+                sessionIds.put(session.sessionId, true);
+            }
+        }
+        List<ResponseRecord> out = new ArrayList<>();
+        for (ResponseRecord response : responses) {
+            if (response.sessionId != null && sessionIds.containsKey(response.sessionId)) out.add(response);
+        }
+        return out;
+    }
+
     public static Stat overall(List<ResponseRecord> rs) {
         Stat s = new Stat("all", "All questions");
         for (ResponseRecord r : rs) {
@@ -94,25 +124,7 @@ public final class StatsAggregator {
     }
 
     public static List<Stat> bySkill(List<ResponseRecord> rs) {
-        Map<String, Stat> map = new LinkedHashMap<>();
-        for (ResponseRecord r : rs) {
-            Stat s = map.get(r.skillId);
-            if (s == null) {
-                Skill skill = CurriculumGuide.byId(r.skillId);
-                s = new Stat(r.skillId, skill == null ? r.skillId : skill.title);
-                map.put(r.skillId, s);
-            }
-            s.total++;
-            if (r.correct) s.correct++;
-        }
-        List<Stat> out = new ArrayList<>(map.values());
-        Collections.sort(out, new Comparator<Stat>() {
-            @Override
-            public int compare(Stat a, Stat b) {
-                return Integer.compare(CurriculumGuide.indexOf(a.key), CurriculumGuide.indexOf(b.key));
-            }
-        });
-        return out;
+        return byTopic(rs);
     }
 
     /** Skills (problem types) the class misses most: most wrong answers first, then lowest accuracy. */

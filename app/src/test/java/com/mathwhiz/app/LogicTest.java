@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import com.mathwhiz.app.logic.DemoData;
 import com.mathwhiz.app.logic.FruitCatalog;
 import com.mathwhiz.app.logic.FruitFacts;
 import com.mathwhiz.app.logic.SessionTracker;
@@ -58,23 +57,31 @@ public class LogicTest {
         List<ResponseRecord> all = new ArrayList<>();
         all.add(resp("Kinder", "Kinder - A", "K-ADD-1", Topic.ADDITION, true, "q1"));
         all.add(resp("Kinder", "Kinder - A", "K-ADD-1", Topic.ADDITION, false, "q2"));
+        all.add(resp("1", "Grade 1 - B", "G1-ADD-2", Topic.ADDITION, true, "q5"));
         all.add(resp("Kinder", "Kinder - A", "K-SUB-1", Topic.SUBTRACTION, false, "q3"));
         all.add(resp("1", "Grade 1 - B", "G1-ADD-1", Topic.ADDITION, true, "q4"));
 
         StatsAggregator.Stat overall = StatsAggregator.overall(all);
-        assertEquals(4, overall.total);
-        assertEquals(2, overall.correct);
+        assertEquals(5, overall.total);
+        assertEquals(3, overall.correct);
 
         List<StatsAggregator.Stat> byTopic = StatsAggregator.byTopic(all);
         assertEquals(2, byTopic.size());
         assertEquals(Topic.ADDITION, byTopic.get(0).key);        // topic order, not insertion order
-        assertEquals(3, byTopic.get(0).total);
-        assertEquals(2, byTopic.get(0).correct);
+        assertEquals(4, byTopic.get(0).total);
+        assertEquals(3, byTopic.get(0).correct);
+
+        List<StatsAggregator.Stat> bySkill = StatsAggregator.bySkill(all);
+        assertEquals(2, bySkill.size());
+        assertEquals(Topic.ADDITION, bySkill.get(0).key);
+        assertEquals("Addition", bySkill.get(0).label);
+        assertEquals(4, bySkill.get(0).total);
+        assertEquals(3, bySkill.get(0).correct);
 
         List<ResponseRecord> kinderOnly = StatsAggregator.filterResponses(all, "Kinder", null);
         assertEquals(3, kinderOnly.size());
-        assertEquals(1, StatsAggregator.filterResponses(all, null, "Grade 1 - B").size());
-        assertEquals(4, StatsAggregator.filterResponses(all, "", "").size());
+        assertEquals(2, StatsAggregator.filterResponses(all, null, "Grade 1 - B").size());
+        assertEquals(5, StatsAggregator.filterResponses(all, "", "").size());
         assertEquals(0, StatsAggregator.filterResponses(all, "1", "Kinder - A").size());
     }
 
@@ -88,7 +95,7 @@ public class LogicTest {
 
         List<StatsAggregator.Stat> missed = StatsAggregator.mostMissed(all, 5);
         assertEquals(2, missed.size());                           // counting has no misses
-        assertEquals("G1-SUB-1", missed.get(0).key);
+        assertEquals(Topic.SUBTRACTION, missed.get(0).key);
         assertEquals(4, missed.get(0).wrong());
         assertEquals(1, StatsAggregator.mostMissed(all, 1).size());
 
@@ -110,22 +117,36 @@ public class LogicTest {
         assertEquals(1000L, kinder.get(0).date);
     }
 
-    // ---------- demo data
     @Test
-    public void demoDataCoversBothGradesAndIsConsistent() {
-        List<DemoData.Pack> packs = DemoData.build("uid1", new Random(5), 1_700_000_000_000L);
-        boolean kinder = false, grade1 = false;
-        for (DemoData.Pack p : packs) {
-            if (p.session.grade.equals("Kinder")) kinder = true;
-            if (p.session.grade.equals("1")) grade1 = true;
-            assertEquals("uid1", p.session.teacherUid);
-            assertEquals(p.session.totalQuestions, p.responses.size());
-            int ok = 0;
-            for (ResponseRecord r : p.responses) if (r.correct) ok++;
-            assertEquals(p.session.totalCorrect, ok);
-            assertTrue(p.session.title.startsWith("DEMO"));
-        }
-        assertTrue(kinder && grade1);
+    public void sessionsCanBeFilteredByDateAndResponsesFollowTheirSessions() {
+        SessionResult older = new SessionResult();
+        older.sessionId = "old";
+        older.date = 99L;
+        SessionResult startBoundary = new SessionResult();
+        startBoundary.sessionId = "start";
+        startBoundary.date = 100L;
+        SessionResult endBoundary = new SessionResult();
+        endBoundary.sessionId = "end";
+        endBoundary.date = 200L;
+
+        List<SessionResult> sessions = new ArrayList<>();
+        sessions.add(older);
+        sessions.add(startBoundary);
+        sessions.add(endBoundary);
+        List<SessionResult> range = StatsAggregator.filterSessionsByDateRange(sessions, 100L, 200L);
+        assertEquals(1, range.size());
+        assertEquals("start", range.get(0).sessionId);
+
+        ResponseRecord matching = resp("1", "S", "skill", Topic.ADDITION, true, "q1");
+        matching.sessionId = "start";
+        ResponseRecord excluded = resp("1", "S", "skill", Topic.ADDITION, true, "q2");
+        excluded.sessionId = "old";
+        List<ResponseRecord> responses = new ArrayList<>();
+        responses.add(matching);
+        responses.add(excluded);
+        List<ResponseRecord> filtered = StatsAggregator.filterResponsesForSessions(responses, range);
+        assertEquals(1, filtered.size());
+        assertEquals("q1", filtered.get(0).question);
     }
 
     // ---------- fruit facts / fallback

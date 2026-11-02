@@ -39,6 +39,13 @@
                 android:background="@drawable/bg_card" />
         </LinearLayout>
 
+        <Spinner
+            android:id="@+id/spDateRange"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_card" />
+
         <ProgressBar
             android:id="@+id/progress"
             android:layout_width="wrap_content"
@@ -131,6 +138,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
+            <Button
+                android:id="@+id/btnViewAllQuestions"
+                style="@style/Widget.MathWhiz.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="View all"
+                android:visibility="gone" />
+
             <TextView
                 style="@style/Text.Heading"
                 android:layout_width="wrap_content"
@@ -142,6 +157,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
+
+            <Button
+                android:id="@+id/btnViewAllHistory"
+                style="@style/Widget.MathWhiz.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="View all"
+                android:visibility="gone" />
         </LinearLayout>
 
         <Button
