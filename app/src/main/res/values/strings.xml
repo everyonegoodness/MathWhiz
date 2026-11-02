@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Math Whiz</string>
+    <string name="tagline">Guided arithmetic practice for Kindergarten to Grade 1</string>
+    <string name="email">Email</string>
+    <string name="password">Password (6+ characters)</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="full_name">Your name</string>
+    <string name="login">Log in</string>
+    <string name="register">Create teacher account</string>
+    <string name="go_register">New teacher? Register</string>
+    <string name="go_login">Already have an account? Log in</string>
+    <string name="new_drill">New drill</string>
+    <string name="my_drills">My drills</string>
+    <string name="dashboard">Class dashboard</string>
+    <string name="demo_data">Load demo data (fake)</string>
+    <string name="logout">Log out</string>
+    <string name="grade">Grade level</string>
+    <string name="section_hint">Section name (e.g. Sampaguita)</string>
+    <string name="skill">Skill</string>
+    <string name="max_number">Largest number</string>
+    <string name="question_count">Number of questions (1-30)</string>
+    <string name="format">Question format</string>
+    <string name="mode">Drill mode</string>
+    <string name="time_limit">Seconds per question (5-120)</string>
+    <string name="drill_title_hint">Drill title (optional)</string>
+    <string name="save_start">Save and start class mode</string>
+    <string name="reveal">Reveal answer</string>
+    <string name="correct">Correct</string>
+    <string name="wrong">Wrong</string>
+    <string name="start">Start!</string>
+    <string name="next_question">Next question</string>
+    <string name="see_results">See results</string>
+    <string name="back_home">Back to home</string>
+    <string name="play_again">Play this drill again</string>
+    <string name="view_dashboard">View dashboard</string>
+    <string name="fun_fact">Fruit fun fact</string>
+    <string name="by_topic">Accuracy by topic</string>
+    <string name="by_skill">Accuracy by skill</string>
+    <string name="most_missed">Most-missed problem types</string>
+    <string name="missed_questions">Missed questions (tap for a fruit fact)</string>
+    <string name="history">Session history</string>
+</resources>

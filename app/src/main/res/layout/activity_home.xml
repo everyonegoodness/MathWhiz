@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            style="@style/Text.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🍎 Math Whiz" />
+
+        <TextView
+            android:id="@+id/tvWelcome"
+            style="@style/Text.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/btnNewDrill"
+            style="@style/Widget.MathWhiz.Button.Green"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/new_drill" />
+
+        <Button
+            android:id="@+id/btnMyDrills"
+            style="@style/Widget.MathWhiz.Button.Orange"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/my_drills" />
+
+        <Button
+            android:id="@+id/btnDashboard"
+            style="@style/Widget.MathWhiz.Button.Blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard" />
+
+        <Button
+            android:id="@+id/btnDemo"
+            style="@style/Widget.MathWhiz.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/demo_data" />
+
+        <Button
+            android:id="@+id/btnLogout"
+            style="@style/Widget.MathWhiz.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/logout" />
+    </LinearLayout>
+</ScrollView>

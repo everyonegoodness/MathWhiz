@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Design system: edit sizes/colors here. Classroom buttons are intentionally huge. -->
+<resources>
+    <style name="Theme.MathWhiz" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/mw_green</item>
+        <item name="colorPrimaryVariant">@color/mw_green_dark</item>
+        <item name="colorOnPrimary">@color/mw_white</item>
+        <item name="colorSecondary">@color/mw_orange</item>
+        <item name="colorOnSecondary">@color/mw_white</item>
+        <item name="android:windowBackground">@color/mw_cream</item>
+        <item name="android:statusBarColor">@color/mw_green_dark</item>
+        <item name="android:textColor">@color/mw_ink</item>
+    </style>
+
+    <style name="Widget.MathWhiz.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:minHeight">72dp</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+    <style name="Widget.MathWhiz.Button.Green"><item name="backgroundTint">@color/mw_green</item></style>
+    <style name="Widget.MathWhiz.Button.Red"><item name="backgroundTint">@color/mw_red</item></style>
+    <style name="Widget.MathWhiz.Button.Orange"><item name="backgroundTint">@color/mw_orange</item></style>
+    <style name="Widget.MathWhiz.Button.Blue"><item name="backgroundTint">@color/mw_blue</item></style>
+    <!-- Compact class-mode variants (60dp tall) -->
+    <style name="Widget.MathWhiz.Button.Orange.Class" parent="Widget.MathWhiz.Button.Orange">
+        <item name="android:minHeight">60dp</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+    <style name="Widget.MathWhiz.Button.Green.Class" parent="Widget.MathWhiz.Button.Green">
+        <item name="android:minHeight">60dp</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+    <style name="Widget.MathWhiz.Button.Red.Class" parent="Widget.MathWhiz.Button.Red">
+        <item name="android:minHeight">60dp</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+    <style name="Widget.MathWhiz.Button.Blue.Class" parent="Widget.MathWhiz.Button.Blue">
+        <item name="android:minHeight">60dp</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+    <style name="Widget.MathWhiz.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+    <style name="Text" />
+
+    <style name="Text.Title">
+        <item name="android:textSize">34sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/mw_green_dark</item>
+    </style>
+    <style name="Text.Heading">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/mw_ink</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+    <style name="Text.Body">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/mw_ink</item>
+    </style>
+    <style name="Text.Error">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/mw_red</item>
+    </style>
+</resources>

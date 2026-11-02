@@ -1,0 +1,187 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['name','email'])",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60"
+        },
+        "email": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "drills": {
+      ".indexOn": [
+        "teacherUid"
+      ],
+      ".read": "auth != null && query.orderByChild === 'teacherUid' && query.equalTo === auth.uid",
+      "$id": {
+        ".read": "auth != null && data.child('teacherUid').val() === auth.uid",
+        ".write": "auth != null && ((!newData.exists() && data.child('teacherUid').val() === auth.uid) || (newData.child('teacherUid').val() === auth.uid && (!data.exists() || data.child('teacherUid').val() === auth.uid)))",
+        ".validate": "newData.hasChildren(['teacherUid', 'title', 'grade', 'section', 'skillId', 'topic', 'minNumber', 'maxNumber', 'questionCount', 'format', 'mode', 'timeLimitSec', 'createdAt'])",
+        "teacherUid": {
+          ".validate": "newData.isString() && newData.val() === auth.uid"
+        },
+        "title": {
+          ".validate": "newData.isString() && newData.val().length <= 80"
+        },
+        "grade": {
+          ".validate": "newData.val() === 'Kinder' || newData.val() === '1'"
+        },
+        "section": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "skillId": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "topic": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "minNumber": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+        },
+        "maxNumber": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+        },
+        "questionCount": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 50"
+        },
+        "format": {
+          ".validate": "newData.val() === 'flashcard' || newData.val() === 'multipleChoice'"
+        },
+        "mode": {
+          ".validate": "newData.val() === 'timed' || newData.val() === 'untimed'"
+        },
+        "timeLimitSec": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 300"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "sessions": {
+      ".indexOn": [
+        "teacherUid"
+      ],
+      ".read": "auth != null && query.orderByChild === 'teacherUid' && query.equalTo === auth.uid",
+      "$id": {
+        ".read": "auth != null && data.child('teacherUid').val() === auth.uid",
+        ".write": "auth != null && ((!newData.exists() && data.child('teacherUid').val() === auth.uid) || (newData.child('teacherUid').val() === auth.uid && (!data.exists() || data.child('teacherUid').val() === auth.uid)))",
+        ".validate": "newData.hasChildren(['teacherUid', 'title', 'grade', 'section', 'skillId', 'topic', 'date', 'totalCorrect', 'totalQuestions'])",
+        "teacherUid": {
+          ".validate": "newData.isString() && newData.val() === auth.uid"
+        },
+        "drillId": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "title": {
+          ".validate": "newData.isString() && newData.val().length <= 100"
+        },
+        "grade": {
+          ".validate": "newData.val() === 'Kinder' || newData.val() === '1'"
+        },
+        "section": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "skillId": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "topic": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "format": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "mode": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "date": {
+          ".validate": "newData.isNumber()"
+        },
+        "totalCorrect": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 50"
+        },
+        "totalQuestions": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 50"
+        },
+        "bestStreak": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 50"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "responses": {
+      ".indexOn": [
+        "teacherUid"
+      ],
+      ".read": "auth != null && query.orderByChild === 'teacherUid' && query.equalTo === auth.uid",
+      "$id": {
+        ".read": "auth != null && data.child('teacherUid').val() === auth.uid",
+        ".write": "auth != null && ((!newData.exists() && data.child('teacherUid').val() === auth.uid) || (newData.child('teacherUid').val() === auth.uid && (!data.exists() || data.child('teacherUid').val() === auth.uid)))",
+        ".validate": "newData.hasChildren(['teacherUid', 'sessionId', 'grade', 'section', 'skillId', 'topic', 'question', 'correct'])",
+        "teacherUid": {
+          ".validate": "newData.isString() && newData.val() === auth.uid"
+        },
+        "sessionId": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "grade": {
+          ".validate": "newData.val() === 'Kinder' || newData.val() === '1'"
+        },
+        "section": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "skillId": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "topic": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "fruit": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "question": {
+          ".validate": "newData.isString() && newData.val().length <= 600"
+        },
+        "correctAnswer": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
+        "chosenOption": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
+        "correct": {
+          ".validate": "newData.isBoolean()"
+        },
+        "timedOut": {
+          ".validate": "newData.isBoolean()"
+        },
+        "timeSec": {
+          ".validate": "newData.isNumber()"
+        },
+        "timestamp": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}
