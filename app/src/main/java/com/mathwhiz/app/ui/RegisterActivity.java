@@ -2,7 +2,11 @@ package com.mathwhiz.app.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -28,6 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        adjustResponsiveLayout();
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
@@ -38,6 +43,25 @@ public class RegisterActivity extends AppCompatActivity {
 
         btnRegister.setOnClickListener(v -> attemptRegister());
         findViewById(R.id.btnGoLogin).setOnClickListener(v -> finish());
+    }
+
+    private void adjustResponsiveLayout() {
+        View container = findViewById(R.id.registerFormContainer);
+        container.post(() -> {
+            int horizontalPadding = container.getPaddingLeft() + container.getPaddingRight();
+            int cardWidth = Math.min(container.getWidth() - horizontalPadding, dp(520));
+            View card = findViewById(R.id.registerCard);
+            ViewGroup.LayoutParams params = card.getLayoutParams();
+            params.width = cardWidth;
+            if (params instanceof FrameLayout.LayoutParams) {
+                ((FrameLayout.LayoutParams) params).gravity = Gravity.CENTER;
+            }
+            card.setLayoutParams(params);
+        });
+    }
+
+    private int dp(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
     }
 
     private void attemptRegister() {

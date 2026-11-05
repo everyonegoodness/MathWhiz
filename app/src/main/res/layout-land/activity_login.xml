@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loginRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mw_cream">
+
+    <com.mathwhiz.app.ui.LoginBackgroundView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/loginBrandingContainer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4">
+
+            <include
+                layout="@layout/login_branding"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="6"
+            android:fillViewport="true">
+
+            <FrameLayout
+                android:id="@+id/loginFormContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp">
+
+                <include
+                    layout="@layout/login_form"
+                    android:layout_gravity="center" />
+            </FrameLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

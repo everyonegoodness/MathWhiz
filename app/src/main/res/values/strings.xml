@@ -2,6 +2,23 @@
 <resources>
     <string name="app_name">Math Whiz</string>
     <string name="tagline">Guided arithmetic practice for Kindergarten to Grade 1</string>
+    <string name="login_branding_description">Teacher Edition, MathWhiz, guided arithmetic practice for Kindergarten to Grade 1</string>
+    <string name="login_welcome">Welcome back!</string>
+    <string name="login_welcome_named">Welcome back, %1$s!</string>
+    <string name="login_subtitle">Log in to your account.</string>
+    <string name="email_label">Email address</string>
+    <string name="email_hint">you@school.edu</string>
+    <string name="password_label">Password</string>
+    <string name="password_hint">Enter your password</string>
+    <string name="password_show">Show</string>
+    <string name="password_hide">Hide</string>
+    <string name="password_show_accessibility">Show password</string>
+    <string name="password_hide_accessibility">Hide password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="new_teacher">New teacher?</string>
+    <string name="register_short">Register</string>
+    <string name="login_footer">Small steps. Bright futures.</string>
+    <string name="password_reset_sent">Password reset instructions were sent to your email.</string>
     <string name="email">Email</string>
     <string name="password">Password (6+ characters)</string>
     <string name="confirm_password">Confirm password</string>
@@ -10,6 +27,8 @@
     <string name="register">Create teacher account</string>
     <string name="go_register">New teacher? Register</string>
     <string name="go_login">Already have an account? Log in</string>
+    <string name="register_title">Create your account</string>
+    <string name="register_subtitle">Sign up to get started.</string>
     <string name="new_drill">New drill</string>
     <string name="my_drills">My drills</string>
     <string name="dashboard">Class dashboard</string>
@@ -37,6 +56,10 @@
     <string name="by_topic">Accuracy by topic</string>
     <string name="by_skill">Accuracy by skill</string>
     <string name="most_missed">Most-missed problem types</string>
+    <string name="view_more">View more</string>
+    <string name="dashboard_preview_loading">Loading class summary…</string>
+    <string name="dashboard_preview_sessions">Based on %1$d class sessions</string>
+    <string name="dashboard_preview_no_sessions">No class sessions yet.</string>
     <string name="missed_questions">Missed questions (tap for a fruit fact)</string>
     <string name="history">Session history</string>
 </resources>

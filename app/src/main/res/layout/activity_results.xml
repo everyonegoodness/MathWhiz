@@ -26,16 +26,16 @@
 
         <TextView
             android:id="@+id/tvScore"
+            style="@style/Text.Number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:textColor="@color/mw_green_dark"
-            android:textSize="96sp"
-            android:textStyle="bold" />
+            android:textSize="96sp" />
 
         <TextView
             android:id="@+id/tvPercent"
-            style="@style/Text.Body"
+            style="@style/Text.Number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp" />

@@ -94,13 +94,15 @@
                 style="@style/Text.Heading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/by_topic" />
+                android:text="@string/most_missed" />
 
-            <LinearLayout
-                android:id="@+id/topicList"
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/mostMissedChart"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:layout_height="300dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card"
+                android:padding="8dp" />
 
             <TextView
                 style="@style/Text.Heading"
@@ -110,18 +112,6 @@
 
             <LinearLayout
                 android:id="@+id/skillList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-
-            <TextView
-                style="@style/Text.Heading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/most_missed" />
-
-            <LinearLayout
-                android:id="@+id/missedList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />

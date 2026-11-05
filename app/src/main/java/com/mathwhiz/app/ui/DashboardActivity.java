@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.mikephil.charting.charts.PieChart;
 import com.mathwhiz.app.R;
 import com.mathwhiz.app.data.AuthRepository;
 import com.mathwhiz.app.data.DataCallback;
@@ -49,9 +50,10 @@ public class DashboardActivity extends AppCompatActivity {
     private Spinner spGrade, spSection, spDateRange;
     private ProgressBar progress;
     private TextView tvError, tvEmpty, tvOverall;
+    private PieChart mostMissedChart;
     private Button btnViewAllQuestions, btnViewAllHistory;
     private View content;
-    private LinearLayout topicList, skillList, missedList, questionList, historyList;
+    private LinearLayout skillList, questionList, historyList;
 
     private SessionRepository.Data data;
     private List<String> sectionValues = new ArrayList<>();
@@ -74,12 +76,11 @@ public class DashboardActivity extends AppCompatActivity {
         tvError = findViewById(R.id.tvError);
         tvEmpty = findViewById(R.id.tvEmpty);
         tvOverall = findViewById(R.id.tvOverall);
+        mostMissedChart = findViewById(R.id.mostMissedChart);
         btnViewAllQuestions = findViewById(R.id.btnViewAllQuestions);
         btnViewAllHistory = findViewById(R.id.btnViewAllHistory);
         content = findViewById(R.id.content);
-        topicList = findViewById(R.id.topicList);
         skillList = findViewById(R.id.skillList);
-        missedList = findViewById(R.id.missedList);
         questionList = findViewById(R.id.questionList);
         historyList = findViewById(R.id.historyList);
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -311,17 +312,10 @@ public class DashboardActivity extends AppCompatActivity {
         tvOverall.setText(Math.round(overall.accuracy()) + "% correct  \u2022  " + overall.correct + " of "
                 + overall.total + " answers  \u2022  " + sessions.size() + " sessions");
 
-        topicList.removeAllViews();
-        for (StatsAggregator.Stat s : StatsAggregator.byTopic(responses)) addStat(topicList, s);
+        MostMissedChart.bind(mostMissedChart, StatsAggregator.mostMissed(responses, 5));
+
         skillList.removeAllViews();
         for (StatsAggregator.Stat s : StatsAggregator.bySkill(responses)) addStat(skillList, s);
-
-        missedList.removeAllViews();
-        List<StatsAggregator.Stat> missed = StatsAggregator.mostMissed(responses, 5);
-        if (missed.isEmpty()) addRow(missedList, "Nothing missed yet \uD83C\uDF89", "", null);
-        for (StatsAggregator.Stat s : missed) {
-            addRow(missedList, s.label, s.wrong() + " wrong out of " + s.total + "  (" + Math.round(s.accuracy()) + "% correct)", null);
-        }
 
         questionList.removeAllViews();
         List<StatsAggregator.MissedQuestion> mq = StatsAggregator.missedQuestions(responses, responses.size());

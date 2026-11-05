@@ -38,12 +38,29 @@ public final class AuthRepository {
         return u.getEmail() == null ? "" : u.getEmail();
     }
 
+    public String currentDisplayName() {
+        FirebaseUser u = auth().getCurrentUser();
+        return u == null ? null : u.getDisplayName();
+    }
+
     public void logout() { auth().signOut(); }
 
     public void login(String email, String password, final DataCallback<Void> cb) {
         auth().signInWithEmailAndPassword(email.trim(), password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) cb.onSuccess(null);
             else cb.onError(friendly(task.getException()));
+        });
+    }
+
+    public void sendPasswordResetEmail(String email, final DataCallback<Void> cb) {
+        auth().sendPasswordResetEmail(email.trim()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) cb.onSuccess(null);
+            else if (task.getException() instanceof FirebaseAuthInvalidUserException
+                    || task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                cb.onError("Unable to send password reset instructions. Check the email address and try again.");
+            } else {
+                cb.onError(friendly(task.getException()));
+            }
         });
     }
 

@@ -17,15 +17,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/nunito_extrabold"
             android:textColor="@color/mw_ink"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/tvStatValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:fontFamily="@font/poppins_bold"
             android:textColor="@color/mw_ink"
             android:textSize="20sp" />
     </LinearLayout>
