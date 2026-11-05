@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Math Whiz palette. Change colors HERE and every screen updates. -->
 <resources>
-    <color name="mw_green">#287334</color>
-    <color name="mw_green_dark">#286A32</color>
-    <color name="mw_orange">#EF6C00</color>
+    <color name="mw_green">#4A7B4A</color>
+    <color name="mw_green_dark">#2F4A35</color>
+    <color name="mw_orange">#E8782F</color>
     <color name="mw_red">#C62828</color>
     <color name="mw_blue">#1565C0</color>
-    <color name="mw_cream">#FFF9E5</color>
+    <color name="mw_cream">#F7F3E8</color>
     <color name="mw_card">#FFFFFF</color>
     <color name="mw_ink">#263238</color>
     <color name="mw_grey">#657366</color>

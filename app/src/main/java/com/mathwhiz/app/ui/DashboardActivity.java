@@ -2,6 +2,9 @@ package com.mathwhiz.app.ui;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -203,7 +206,9 @@ public class DashboardActivity extends AppCompatActivity {
 
     private String sectionLabel(SessionResult session) {
         String section = session.section.trim();
-        String prefix = Grade.label(session.grade) + " - ";
+        String prefix = Grade.label(session.grade) + " \u2013 ";
+        if (section.startsWith("Kinder - ")) section = section.substring("Kinder - ".length()).trim();
+        if (section.startsWith("Kindergarten - ")) section = section.substring("Kindergarten - ".length()).trim();
         return section.startsWith(prefix) ? section.substring(prefix.length()).trim() : section;
     }
 
@@ -309,8 +314,13 @@ public class DashboardActivity extends AppCompatActivity {
         if (empty) return;
 
         StatsAggregator.Stat overall = StatsAggregator.overall(responses);
-        tvOverall.setText(Math.round(overall.accuracy()) + "% correct  \u2022  " + overall.correct + " of "
-                + overall.total + " answers  \u2022  " + sessions.size() + " sessions");
+        String overallText = Math.round(overall.accuracy()) + "% correct  \u2022  "
+                + overall.correct + " of " + overall.total + " answers  \u2022  "
+                + sessions.size() + " sessions";
+        SpannableString coloredOverall = new SpannableString(overallText);
+        coloredOverall.setSpan(new ForegroundColorSpan(getColor(R.color.mw_red)), 0, overallText.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvOverall.setText(coloredOverall);
 
         MostMissedChart.bind(mostMissedChart, StatsAggregator.mostMissed(responses, 5));
 

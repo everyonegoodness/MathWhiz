@@ -1,42 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:background="@drawable/bg_home_stripes">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:layout_height="210dp"
+        android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="12dp">
+
+        <ImageView
+            android:layout_width="280dp"
+            android:layout_height="165dp"
+            android:contentDescription="@string/app_name"
+            android:scaleType="fitCenter"
+            android:src="@drawable/home_logo_transparent" />
 
         <TextView
-            style="@style/Text.Title"
+            style="@style/Text.Logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🍎 Math Whiz" />
+            android:letterSpacing="0.14"
+            android:text="TEACHER EDITION"
+            android:textColor="@color/mw_green_dark"
+            android:textSize="18sp" />
+    </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvWelcome"
-            style="@style/Text.Body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:textSize="22sp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="170dp"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="420dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:background="@drawable/bg_main_panel"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/tvWelcome"
+                    style="@style/Text.Logo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center"
+                    android:textColor="@color/mw_green_dark"
+                    android:text="What would you like to do today?"
+                    android:textSize="32sp" />
 
                 <Button
                     android:id="@+id/btnNewDrill"
@@ -58,64 +78,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/dashboard" />
-
-                <Button
-                    android:id="@+id/btnLogout"
-                    style="@style/Widget.MathWhiz.TextButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/logout" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/dashboardPreview"
-                android:layout_width="0dp"
+            <Button
+                android:id="@+id/btnLogout"
+                style="@style/Widget.MathWhiz.TextButton"
+                android:layout_width="420dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.35"
-                android:background="@drawable/bg_card"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    style="@style/Text.Heading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="0dp"
-                    android:text="@string/most_missed" />
-
-                <TextView
-                    android:id="@+id/tvDashboardPreviewSummary"
-                    style="@style/Text.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp" />
-
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/homeMostMissedChart"
-                    android:layout_width="match_parent"
-                    android:layout_height="260dp" />
-
-                <ProgressBar
-                    android:id="@+id/dashboardPreviewProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/tvDashboardPreviewError"
-                    style="@style/Text.Error"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/btnDashboardMore"
-                    style="@style/Widget.MathWhiz.TextButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/view_more" />
-            </LinearLayout>
+                android:textColor="@color/mw_green_dark"
+                android:text="@string/logout" />
         </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="145dp"
+        android:layout_gravity="bottom"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/bg_home_land" />
+</FrameLayout>

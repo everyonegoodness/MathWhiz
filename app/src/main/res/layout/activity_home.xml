@@ -1,55 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:background="@drawable/bg_home_stripes">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="230dp"
+        android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="12dp">
+
+        <ImageView
+            android:layout_width="230dp"
+            android:layout_height="170dp"
+            android:contentDescription="@string/app_name"
+            android:scaleType="fitCenter"
+            android:src="@drawable/home_logo_transparent" />
 
         <TextView
-            style="@style/Text.Title"
+            style="@style/Text.Logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🍎 Math Whiz" />
-
-        <TextView
-            android:id="@+id/tvWelcome"
-            style="@style/Text.Body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:textSize="22sp" />
-
-        <Button
-            android:id="@+id/btnNewDrill"
-            style="@style/Widget.MathWhiz.Button.Green"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/new_drill" />
-
-        <Button
-            android:id="@+id/btnMyDrills"
-            style="@style/Widget.MathWhiz.Button.Orange"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/my_drills" />
-
-        <Button
-            android:id="@+id/btnDashboard"
-            style="@style/Widget.MathWhiz.Button.Blue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/dashboard" />
-
-        <Button
-            android:id="@+id/btnLogout"
-            style="@style/Widget.MathWhiz.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/logout" />
+            android:letterSpacing="0.12"
+            android:text="TEACHER EDITION"
+            android:textColor="@color/mw_green_dark"
+            android:textSize="16sp" />
     </LinearLayout>
-</ScrollView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="190dp"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_main_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvWelcome"
+                    style="@style/Text.Logo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center"
+                    android:textColor="@color/mw_green_dark"
+                    android:text="Hello, teacher!"
+                    android:lineSpacingExtra="0dp"
+                    android:textSize="27sp" />
+
+                <Button
+                    android:id="@+id/btnNewDrill"
+                    style="@style/Widget.MathWhiz.Button.Green"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_drill" />
+
+                <Button
+                    android:id="@+id/btnMyDrills"
+                    style="@style/Widget.MathWhiz.Button.Orange"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/my_drills" />
+
+                <Button
+                    android:id="@+id/btnDashboard"
+                    style="@style/Widget.MathWhiz.Button.Blue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dashboard" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnLogout"
+                style="@style/Widget.MathWhiz.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/logout"
+                android:textColor="@color/mw_green_dark" />
+        </LinearLayout>
+    </ScrollView>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="125dp"
+        android:layout_gravity="bottom"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/bg_home_land" />
+</FrameLayout>

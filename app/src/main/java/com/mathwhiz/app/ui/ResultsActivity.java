@@ -12,6 +12,7 @@ import com.mathwhiz.app.data.DataCallback;
 import com.mathwhiz.app.data.FruitRepository;
 import com.mathwhiz.app.logic.FruitCatalog;
 import com.mathwhiz.app.model.Drill;
+import com.mathwhiz.app.model.Topic;
 import com.mathwhiz.app.model.FactResult;
 
 import java.util.ArrayList;
@@ -35,7 +36,8 @@ public class ResultsActivity extends AppCompatActivity {
         ArrayList<String> used = getIntent().getStringArrayListExtra(IntentKeys.USED_FRUITS);
 
         int percent = total == 0 ? 0 : (int) Math.round(100.0 * correct / total);
-        ((TextView) findViewById(R.id.tvResultTitle)).setText(drill == null ? "Results" : drill.title);
+        ((TextView) findViewById(R.id.tvResultTitle)).setText(
+                drill == null ? "Results" : DrillTitle.display(drill));
         ((TextView) findViewById(R.id.tvResultSection)).setText(drill == null ? "" : drill.section);
         ((TextView) findViewById(R.id.tvScore)).setText(correct + " / " + total);
         ((TextView) findViewById(R.id.tvPercent)).setText(percent + "% correct  \u2022  Best streak: " + best);
@@ -62,6 +64,8 @@ public class ResultsActivity extends AppCompatActivity {
                 finish();
             });
         }
+        FruitRainView fruitRain = findViewById(R.id.fruitRain);
+        fruitRain.start(used);
         loadFact(missed, used);
     }
 

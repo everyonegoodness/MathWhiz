@@ -1,6 +1,9 @@
 package com.mathwhiz.app.ui;
 
 import android.graphics.Color;
+import android.graphics.Typeface;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -9,6 +12,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.mathwhiz.app.logic.StatsAggregator;
+import com.mathwhiz.app.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,9 +45,11 @@ public final class MostMissedChart {
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "Wrong answers");
+        Typeface appTypeface = ResourcesCompat.getFont(chart.getContext(), R.font.nunito_sans);
         dataSet.setColors(COLORS);
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(5f);
+        dataSet.setValueTypeface(appTypeface);
 
         PieData data = new PieData(dataSet);
         data.setValueTextSize(13f);
@@ -63,6 +69,7 @@ public final class MostMissedChart {
 
         Legend legend = chart.getLegend();
         legend.setEnabled(true);
+        legend.setTypeface(appTypeface);
         legend.setForm(Legend.LegendForm.CIRCLE);
         legend.setTextSize(12f);
         legend.setTextColor(Color.rgb(38, 50, 56));

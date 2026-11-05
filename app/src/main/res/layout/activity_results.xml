@@ -1,30 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:background="@drawable/bg_home_stripes"
+    android:clipChildren="false">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="match_parent"
+        android:padding="24dp"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/tvResultTitle"
-            style="@style/Text.Title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:background="@drawable/bg_main_panel"
+            android:padding="16dp">
+            <TextView
+                android:id="@+id/tvResultTitle"
+                style="@style/Text.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
 
-        <TextView
+            <TextView
             android:id="@+id/tvResultSection"
             style="@style/Text.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <TextView
+            <TextView
             android:id="@+id/tvScore"
             style="@style/Text.Number"
             android:layout_width="wrap_content"
@@ -33,21 +40,21 @@
             android:textColor="@color/mw_green_dark"
             android:textSize="96sp" />
 
-        <TextView
+            <TextView
             android:id="@+id/tvPercent"
             style="@style/Text.Number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp" />
 
-        <TextView
+            <TextView
             android:id="@+id/tvMessage"
             style="@style/Text.Heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center" />
 
-        <LinearLayout
+            <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -92,7 +99,7 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <Button
+            <Button
             android:id="@+id/btnAgain"
             style="@style/Widget.MathWhiz.Button.Orange"
             android:layout_width="match_parent"
@@ -100,18 +107,27 @@
             android:layout_marginTop="16dp"
             android:text="@string/play_again" />
 
-        <Button
+            <Button
             android:id="@+id/btnDashboard"
             style="@style/Widget.MathWhiz.Button.Blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/view_dashboard" />
 
-        <Button
+            <Button
             android:id="@+id/btnHome"
             style="@style/Widget.MathWhiz.Button.Green"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/back_home" />
-    </LinearLayout>
-</ScrollView>
+        </LinearLayout>
+    </ScrollView>
+
+    <com.mathwhiz.app.ui.FruitRainView
+        android:id="@+id/fruitRain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:clickable="false"
+        android:focusable="false" />
+</FrameLayout>

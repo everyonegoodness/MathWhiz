@@ -8,7 +8,7 @@ public final class Grade {
     private Grade() {}
 
     public static String label(String grade) {
-        if (KINDER.equals(grade)) return "Kinder";
+        if (KINDER.equals(grade)) return "Kindergarten";
         if (GRADE_1.equals(grade)) return "Grade 1";
         return grade == null ? "" : grade;
     }

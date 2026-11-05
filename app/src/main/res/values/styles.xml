@@ -59,36 +59,36 @@
     <style name="Text" />
 
     <style name="Text.Logo">
-        <item name="android:fontFamily">@font/baloo2_extrabold</item>
-        <item name="fontFamily">@font/baloo2_extrabold</item>
+        <item name="android:fontFamily">@font/nunito_extrabold</item>
+        <item name="fontFamily">@font/nunito_extrabold</item>
     </style>
     <style name="Text.Title">
         <item name="android:textSize">34sp</item>
-        <item name="android:fontFamily">@font/nunito_extrabold</item>
-        <item name="fontFamily">@font/nunito_extrabold</item>
+        <item name="android:fontFamily">@font/baloo2_extrabold</item>
+        <item name="fontFamily">@font/baloo2_extrabold</item>
         <item name="android:textColor">@color/mw_green_dark</item>
     </style>
     <style name="Text.Heading">
         <item name="android:textSize">24sp</item>
-        <item name="android:fontFamily">@font/nunito_extrabold</item>
-        <item name="fontFamily">@font/nunito_extrabold</item>
+        <item name="android:fontFamily">@font/baloo2_extrabold</item>
+        <item name="fontFamily">@font/baloo2_extrabold</item>
         <item name="android:textColor">@color/mw_ink</item>
         <item name="android:layout_marginTop">20dp</item>
         <item name="android:layout_marginBottom">8dp</item>
     </style>
     <style name="Text.Body">
         <item name="android:textSize">18sp</item>
-        <item name="android:fontFamily">@font/nunito_sans</item>
-        <item name="fontFamily">@font/nunito_sans</item>
+        <item name="android:fontFamily">@font/nunito_bold</item>
+        <item name="fontFamily">@font/nunito_bold</item>
         <item name="android:textColor">@color/mw_ink</item>
     </style>
     <style name="Text.Question">
-        <item name="android:fontFamily">@font/nunito_bold</item>
-        <item name="fontFamily">@font/nunito_bold</item>
+        <item name="android:fontFamily">@font/nunito_sans</item>
+        <item name="fontFamily">@font/nunito_sans</item>
     </style>
     <style name="Text.Number">
-        <item name="android:fontFamily">@font/poppins_bold</item>
-        <item name="fontFamily">@font/poppins_bold</item>
+        <item name="android:fontFamily">@font/nunito_sans</item>
+        <item name="fontFamily">@font/nunito_sans</item>
     </style>
     <style name="Text.Error">
         <item name="android:textSize">16sp</item>

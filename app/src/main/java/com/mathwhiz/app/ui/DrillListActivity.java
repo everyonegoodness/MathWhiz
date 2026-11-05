@@ -1,7 +1,6 @@
 package com.mathwhiz.app.ui;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -14,6 +13,9 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,14 +26,13 @@ import com.mathwhiz.app.data.AuthRepository;
 import com.mathwhiz.app.data.DataCallback;
 import com.mathwhiz.app.data.DrillRepository;
 import com.mathwhiz.app.model.Drill;
+import com.mathwhiz.app.model.Topic;
 import com.mathwhiz.app.model.Grade;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /** The teacher's saved drills. Tap one to run it in class mode again. */
 public class DrillListActivity extends AppCompatActivity {
@@ -39,7 +40,8 @@ public class DrillListActivity extends AppCompatActivity {
     private ProgressBar progress;
     private TextView tvEmpty, tvError;
     private List<DrillRepository.Entry> entries = new ArrayList<>();
-    private final Set<String> expandedSections = new HashSet<>();
+    private Spinner spGrade;
+    private boolean gradeReady;
     private View openRow;
     private int touchSlop;
 
@@ -51,6 +53,20 @@ public class DrillListActivity extends AppCompatActivity {
         progress = findViewById(R.id.progress);
         tvEmpty = findViewById(R.id.tvEmpty);
         tvError = findViewById(R.id.tvError);
+        spGrade = findViewById(R.id.spGrade);
+        ArrayAdapter<String> gradeAdapter = new ArrayAdapter<>(this, R.layout.item_spinner,
+                new String[]{"All grades", "Kindergarten", "Grade 1"});
+        gradeAdapter.setDropDownViewResource(R.layout.item_spinner);
+        spGrade.setAdapter(gradeAdapter);
+        spGrade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (gradeReady) render(entries);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
         touchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
@@ -77,6 +93,7 @@ public class DrillListActivity extends AppCompatActivity {
             @Override
             public void onSuccess(List<DrillRepository.Entry> entries) {
                 UiUtils.show(progress, false);
+                gradeReady = true;
                 render(entries);
             }
 
@@ -95,9 +112,11 @@ public class DrillListActivity extends AppCompatActivity {
         UiUtils.show(tvEmpty, entries.isEmpty());
 
         Map<String, Map<String, List<DrillRepository.Entry>>> groups = new LinkedHashMap<>();
+        String selectedGrade = selectedGrade();
         for (final DrillRepository.Entry e : entries) {
             Drill drill = e.drill;
             String grade = drill.grade == null ? "" : drill.grade;
+            if (!selectedGrade.isEmpty() && !selectedGrade.equals(grade)) continue;
             String section = sectionName(drill);
             Map<String, List<DrillRepository.Entry>> sections = groups.get(grade);
             if (sections == null) {
@@ -113,44 +132,39 @@ public class DrillListActivity extends AppCompatActivity {
         }
 
         for (Map.Entry<String, Map<String, List<DrillRepository.Entry>>> grade : groups.entrySet()) {
-            addHeading(Grade.label(grade.getKey()), true);
+            String gradeKey = grade.getKey();
+            addHeading(Grade.label(gradeKey), true);
             for (Map.Entry<String, List<DrillRepository.Entry>> section : grade.getValue().entrySet()) {
-                addSection(section.getKey(), grade.getKey(), section.getValue());
+                addSection(section.getKey(), gradeKey, section.getValue());
             }
         }
     }
 
+    private String selectedGrade() {
+        int position = spGrade == null ? 0 : spGrade.getSelectedItemPosition();
+        if (position == 1) return Grade.KINDER;
+        if (position == 2) return Grade.GRADE_1;
+        return "";
+    }
+
     private void addSection(String sectionName, String grade, List<DrillRepository.Entry> sectionDrills) {
-        String sectionKey = grade + "\u0000" + sectionName;
         LinearLayout sectionBlock = new LinearLayout(this);
         sectionBlock.setOrientation(LinearLayout.VERTICAL);
-        sectionBlock.setPadding(dp(12), 0, 0, dp(4));
+        sectionBlock.setPadding(0, 0, 0, dp(8));
         list.addView(sectionBlock, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
         addHeading(sectionName, false, sectionBlock);
-
-        boolean expanded = expandedSections.contains(sectionKey);
-        int count = expanded ? sectionDrills.size() : Math.min(2, sectionDrills.size());
-        for (int i = 0; i < count; i++) addDrillRow(sectionDrills.get(i), sectionBlock);
-
-        if (sectionDrills.size() > 2) {
-            Button viewAll = new Button(this);
-            viewAll.setText(expanded ? "Show less" : "View all (" + sectionDrills.size() + ")");
-            viewAll.setAllCaps(false);
-            viewAll.setTextSize(16);
-            sectionBlock.addView(viewAll, new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            viewAll.setOnClickListener(v -> {
-                if (expandedSections.contains(sectionKey)) expandedSections.remove(sectionKey);
-                else expandedSections.add(sectionKey);
-                render(entries);
-            });
+        for (DrillRepository.Entry entry : sectionDrills) {
+            addDrillRow(entry, sectionBlock);
         }
     }
 
     private String sectionName(Drill drill) {
         String section = drill.section == null ? "" : drill.section.trim();
-        String prefix = Grade.label(drill.grade) + " - ";
+        String prefix = Grade.label(drill.grade) + " \u2013 ";
+        if (section.startsWith("Kinder - ")) section = section.substring("Kinder - ".length()).trim();
+        if (section.startsWith("Kindergarten - ")) section = section.substring("Kindergarten - ".length()).trim();
         if (section.startsWith(prefix)) section = section.substring(prefix.length()).trim();
         return section.isEmpty() ? "Unspecified section" : section;
     }
@@ -175,7 +189,8 @@ public class DrillListActivity extends AppCompatActivity {
         FrameLayout container = new FrameLayout(this);
         LinearLayout actions = new LinearLayout(this);
         actions.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
-        int actionWidth = dp(252);
+        actions.setPadding(dp(8), dp(8), dp(8), dp(8));
+        int actionWidth = dp(228);
         FrameLayout.LayoutParams actionParams = new FrameLayout.LayoutParams(
                 actionWidth, dp(80), Gravity.END | Gravity.CENTER_VERTICAL);
         container.addView(actions, actionParams);
@@ -185,7 +200,7 @@ public class DrillListActivity extends AppCompatActivity {
 
         View row = LayoutInflater.from(this).inflate(R.layout.item_row, container, false);
         Drill drill = entry.drill;
-        ((TextView) row.findViewById(R.id.tvRowTitle)).setText(drill.title);
+        ((TextView) row.findViewById(R.id.tvRowTitle)).setText(DrillTitle.display(drill));
         String detail = drill.questionCount + " questions  \u2022  "
                 + (drill.formatIsMultipleChoice() ? "Multiple choice" : "Flashcard")
                 + (drill.modeIsTimed() ? "  \u2022  Timed " + drill.timeLimitSec + "s" : "  \u2022  Untimed");
@@ -276,10 +291,19 @@ public class DrillListActivity extends AppCompatActivity {
         button.setTextSize(12);
         button.setTextColor(Color.WHITE);
         button.setAllCaps(false);
-        button.setPadding(0, 0, 0, 0);
+        button.setPadding(dp(4), 0, dp(4), 0);
         button.setMinWidth(0);
-        button.setBackgroundTintList(ColorStateList.valueOf(getColor(color)));
-        actions.addView(button, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        if ("Edit".equals(title)) {
+            button.setBackgroundResource(R.drawable.bg_action_edit);
+        } else if ("Delete".equals(title)) {
+            button.setBackgroundResource(R.drawable.bg_action_delete);
+        } else {
+            button.setBackgroundResource(R.drawable.bg_action_duplicate);
+        }
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+        params.setMargins(dp(3), 0, dp(3), 0);
+        actions.addView(button, params);
         button.setOnClickListener(v -> {
             if (openRow != null) closeRow(openRow);
             action.run();

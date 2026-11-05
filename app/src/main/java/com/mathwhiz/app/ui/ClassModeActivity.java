@@ -29,6 +29,7 @@ import com.mathwhiz.app.logic.SessionTracker;
 import com.mathwhiz.app.model.Drill;
 import com.mathwhiz.app.model.FruitsResult;
 import com.mathwhiz.app.model.Question;
+import com.mathwhiz.app.model.Topic;
 import com.mathwhiz.app.model.ResponseRecord;
 import com.mathwhiz.app.model.SessionResult;
 import com.mathwhiz.app.model.Skill;
@@ -56,6 +57,7 @@ public class ClassModeActivity extends AppCompatActivity {
     private final Set<String> usedFruits = new LinkedHashSet<>();
     private State state = State.LOADING;
     private int index;
+    private int selectedOptionIndex = -1;
     private long questionStartMs;
     private long remainingMs;
     private CountDownTimer timer;
@@ -63,10 +65,16 @@ public class ClassModeActivity extends AppCompatActivity {
     private View startPanel, feedbackPanel, rowMark, mcGrid;
     private ScrollView questionScroll;
     private TextView tvStartTitle, tvStartInfo, tvFruitStatus;
+    private TextView tvTeacherMode;
     private TextView tvProgress, tvStreak, tvTimer, tvScore, tvPrompt, tvVisual, tvAnswer, tvFeedback;
     private Button btnStart, btnReveal, btnCorrect, btnWrong, btnNext;
     private Button[] optionButtons;
     private ProgressBar startProgress;
+    private final PresentationCoordinator.StatusListener displayStatusListener = available -> {
+        if (tvTeacherMode != null) {
+            UiUtils.show(tvTeacherMode, available);
+        }
+    };
 
     @Override
     @SuppressWarnings("deprecation")
@@ -83,16 +91,15 @@ public class ClassModeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_class_mode);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         bindViews();
+        PresentationCoordinator.get().showWaiting();
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() { confirmExit(); }
         });
 
-        tvStartTitle.setText(drill.title);
-        tvStartInfo.setText(drill.section + "\n" + drill.questionCount + " questions  \u2022  "
-                + (drill.formatIsMultipleChoice() ? "Multiple choice" : "Flashcard")
-                + (drill.modeIsTimed() ? "  \u2022  Timed: " + drill.timeLimitSec + " s each" : "  \u2022  Untimed"));
+        tvStartTitle.setText(DrillTitle.display(drill));
+        tvStartInfo.setText(drill.section);
         btnStart.setEnabled(false);
         btnStart.setOnClickListener(v -> {
             UiUtils.show(startPanel, false);
@@ -104,6 +111,7 @@ public class ClassModeActivity extends AppCompatActivity {
 
     private void bindViews() {
         startPanel = findViewById(R.id.startPanel);
+        tvTeacherMode = findViewById(R.id.tvTeacherMode);
         feedbackPanel = findViewById(R.id.feedbackPanel);
         rowMark = findViewById(R.id.rowMark);
         mcGrid = findViewById(R.id.mcGrid);
@@ -171,6 +179,7 @@ public class ClassModeActivity extends AppCompatActivity {
 
     private void showQuestion(int i) {
         index = i;
+        selectedOptionIndex = -1;
         questionScroll.post(() -> questionScroll.scrollTo(0, 0));
         Question q = questions.get(i);
         boolean mc = drill.formatIsMultipleChoice();
@@ -207,6 +216,7 @@ public class ClassModeActivity extends AppCompatActivity {
         } else {
             UiUtils.show(tvTimer, false);
         }
+        PresentationCoordinator.get().showQuestion(drill, q, i, questions.size());
     }
 
     private void onReveal() {
@@ -216,6 +226,7 @@ public class ClassModeActivity extends AppCompatActivity {
         UiUtils.show(btnReveal, false);
         UiUtils.show(rowMark, true);
         state = State.REVEALED;
+        PresentationCoordinator.get().showAnswer();
     }
 
     private void onMark(boolean correct) {
@@ -232,6 +243,7 @@ public class ClassModeActivity extends AppCompatActivity {
         int red = ContextCompat.getColor(this, R.color.mw_red);
         optionButtons[q.correctIndex].setBackgroundTintList(ColorStateList.valueOf(green));   // always show the answer
         if (!correct) optionButtons[choice].setBackgroundTintList(ColorStateList.valueOf(red));
+        selectedOptionIndex = choice;
         record(correct, Question.letter(choice) + "   " + q.options.get(choice), false);
         showFeedback(correct, false);
     }
@@ -290,6 +302,11 @@ public class ClassModeActivity extends AppCompatActivity {
         UiUtils.show(btnNext, true);
         state = State.ANSWERED;
         updateStatus();
+        PresentationCoordinator.get().showFeedback(correct,
+                getString(timedOut ? R.string.classroom_times_up
+                        : correct ? R.string.classroom_correct : R.string.classroom_incorrect),
+                drill.formatIsMultipleChoice() ? q.correctIndex : -1,
+                selectedOptionIndex);
     }
 
     private void onNext() {
@@ -299,7 +316,7 @@ public class ClassModeActivity extends AppCompatActivity {
     }
 
     private void updateStatus() {
-        tvStreak.setText("\uD83D\uDD25 Streak: " + tracker.getStreak());
+        tvStreak.setText("🔥 Streak: " + tracker.getStreak());
         tvScore.setText("\u2714 " + tracker.getCorrect() + "   \u2716 " + tracker.getWrong());
     }
 
@@ -336,6 +353,7 @@ public class ClassModeActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        PresentationCoordinator.get().setStatusListener(displayStatusListener);
         // Resume the countdown after the screen was in the background.
         if (drill != null && drill.modeIsTimed() && (state == State.ASKING || state == State.REVEALED) && remainingMs > 0) {
             startTimer(remainingMs);
@@ -344,8 +362,15 @@ public class ClassModeActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        PresentationCoordinator.get().clearStatusListener(displayStatusListener);
         super.onStop();
         cancelTimer();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (isFinishing()) PresentationCoordinator.get().showWaiting();
+        super.onDestroy();
     }
 
     // ------------------------------------------------------------------ finishing
@@ -365,6 +390,7 @@ public class ClassModeActivity extends AppCompatActivity {
 
     private void finishDrill() {
         cancelTimer();
+        PresentationCoordinator.get().showWaiting();
         String uid = AuthRepository.get().currentUid();
         if (uid == null) {
             UiUtils.toast(this, "You were signed out, so the results could not be saved.");

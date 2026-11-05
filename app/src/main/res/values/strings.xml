@@ -37,10 +37,12 @@
     <string name="section_hint">Section name (e.g. Sampaguita)</string>
     <string name="skill">Skill</string>
     <string name="max_number">Largest number</string>
-    <string name="question_count">Number of questions (1-30)</string>
+    <string name="question_count">Number of questions (1–30)</string>
     <string name="format">Question format</string>
     <string name="mode">Drill mode</string>
-    <string name="time_limit">Seconds per question (5-120)</string>
+    <string name="time_limit">Seconds per question (5–120)</string>
+    <string name="try_again">Try again</string>
+    <string name="view_all">View all</string>
     <string name="drill_title_hint">Drill title (optional)</string>
     <string name="save_start">Save and start class mode</string>
     <string name="reveal">Reveal answer</string>
@@ -60,6 +62,14 @@
     <string name="dashboard_preview_loading">Loading class summary…</string>
     <string name="dashboard_preview_sessions">Based on %1$d class sessions</string>
     <string name="dashboard_preview_no_sessions">No class sessions yet.</string>
+    <string name="teacher_mode_active">Teacher mode • Classroom display connected</string>
+    <string name="classroom_waiting_title">Waiting for the teacher</string>
+    <string name="classroom_waiting_message">The next class activity will appear here.</string>
+    <string name="classroom_progress">Question %1$d of %2$d</string>
+    <string name="classroom_answer">Answer: %1$s</string>
+    <string name="classroom_correct">Correct!</string>
+    <string name="classroom_incorrect">Not quite</string>
+    <string name="classroom_times_up">Time’s up!</string>
     <string name="missed_questions">Missed questions (tap for a fruit fact)</string>
     <string name="history">Session history</string>
 </resources>

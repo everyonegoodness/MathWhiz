@@ -26,9 +26,9 @@ public final class CurriculumGuide {
     static {
         List<Skill> s = new ArrayList<>();
         // ---- Kindergarten ----
-        s.add(new Skill("K-CNT-1", Grade.KINDER, Topic.COUNTING, "Count objects 1-5", 1, 5, Skill.STYLE_NONE, PLACEHOLDER));
-        s.add(new Skill("K-CNT-2", Grade.KINDER, Topic.COUNTING, "Count objects 1-10", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
-        s.add(new Skill("K-NUM-1", Grade.KINDER, Topic.NUMBER_RECOGNITION, "Recognize numerals 1-10", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
+        s.add(new Skill("K-CNT-1", Grade.KINDER, Topic.COUNTING, "Count objects 1–5", 1, 5, Skill.STYLE_NONE, PLACEHOLDER));
+        s.add(new Skill("K-CNT-2", Grade.KINDER, Topic.COUNTING, "Count objects 1–10", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
+        s.add(new Skill("K-NUM-1", Grade.KINDER, Topic.NUMBER_RECOGNITION, "Recognize numerals 1–10", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
         s.add(new Skill("K-CMP-1", Grade.KINDER, Topic.COMPARING, "Which group has more or fewer (up to 10)", 1, 10, Skill.STYLE_GROUPS, PLACEHOLDER));
         s.add(new Skill("K-ADD-1", Grade.KINDER, Topic.ADDITION, "Join groups", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
         s.add(new Skill("K-SUB-1", Grade.KINDER, Topic.SUBTRACTION, "Take away", 1, 10, Skill.STYLE_NONE, PLACEHOLDER));
