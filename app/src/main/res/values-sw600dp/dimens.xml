@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tablets (smallest width >= 600dp): bigger text and touch targets so the screen is not mostly empty. -->
+<resources>
+    <dimen name="screen_gutter">64dp</dimen>
+
+    <dimen name="class_status_text">22sp</dimen>
+    <dimen name="class_prompt_text">38sp</dimen>
+    <dimen name="class_visual_min_text">32sp</dimen>
+    <dimen name="class_visual_max_text">180sp</dimen>
+    <dimen name="class_option_min_text">16sp</dimen>
+    <dimen name="class_option_max_text">40sp</dimen>
+    <dimen name="class_answer_text">32sp</dimen>
+    <dimen name="class_feedback_text">28sp</dimen>
+    <dimen name="class_button_text">28sp</dimen>
+    <dimen name="class_button_min_height">72dp</dimen>
+    <dimen name="class_option_min_height">68dp</dimen>
+
+    <dimen name="results_fact_emoji">88sp</dimen>
+    <dimen name="fruit_rain_text">52sp</dimen>
+</resources>

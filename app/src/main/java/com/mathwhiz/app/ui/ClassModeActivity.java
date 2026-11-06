@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -103,6 +104,7 @@ public class ClassModeActivity extends AppCompatActivity {
         btnStart.setEnabled(false);
         btnStart.setOnClickListener(v -> {
             UiUtils.show(startPanel, false);
+            findViewById(R.id.bottomControls).setVisibility(View.VISIBLE);
             showQuestion(0);
         });
         findViewById(R.id.btnStartBack).setOnClickListener(v -> finish());
@@ -135,6 +137,13 @@ public class ClassModeActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         optionButtons = new Button[]{findViewById(R.id.btnOptA), findViewById(R.id.btnOptB),
                 findViewById(R.id.btnOptC), findViewById(R.id.btnOptD)};
+
+        // Re-fit the fruit picture whenever the free space changes (rotation, answer/feedback shown, tablet vs phone).
+        View.OnLayoutChangeListener refit = (v, l, t, r, b, ol, ot, or, ob) -> {
+            if (r - l != or - ol || b - t != ob - ot) v.post(this::fitQuestionText);
+        };
+        questionScroll.addOnLayoutChangeListener(refit);
+        mcGrid.addOnLayoutChangeListener(refit);
 
         btnReveal.setOnClickListener(v -> onReveal());
         btnCorrect.setOnClickListener(v -> onMark(true));
@@ -180,7 +189,10 @@ public class ClassModeActivity extends AppCompatActivity {
     private void showQuestion(int i) {
         index = i;
         selectedOptionIndex = -1;
-        questionScroll.post(() -> questionScroll.scrollTo(0, 0));
+        questionScroll.post(() -> {
+            fitQuestionText();
+            questionScroll.scrollTo(0, 0);
+        });
         Question q = questions.get(i);
         boolean mc = drill.formatIsMultipleChoice();
 
@@ -196,6 +208,7 @@ public class ClassModeActivity extends AppCompatActivity {
             UiUtils.show(mcGrid, true);
             UiUtils.show(btnReveal, false);
             UiUtils.show(rowMark, false);
+            stackOptions(q.optionsAreVisual);
             int blue = ContextCompat.getColor(this, R.color.mw_blue);
             for (int k = 0; k < optionButtons.length; k++) {
                 optionButtons[k].setText(Question.letter(k) + "   " + q.options.get(k));
@@ -217,6 +230,79 @@ public class ClassModeActivity extends AppCompatActivity {
             UiUtils.show(tvTimer, false);
         }
         PresentationCoordinator.get().showQuestion(drill, q, i, questions.size());
+    }
+
+    /**
+     * Makes the fruit picture as big as the free space allows (it used to stay at the 24sp autosize minimum),
+     * and sizes the A-D option buttons so fruit groups fill the button width without breaking rows.
+     */
+    private void fitQuestionText() {
+        if (questions.isEmpty() || isFinishing()) return;
+
+        if (tvVisual.getVisibility() == View.VISIBLE && questionScroll.getHeight() > 0) {
+            View content = questionScroll.getChildAt(0);
+            int width = questionScroll.getWidth() - questionScroll.getPaddingLeft() - questionScroll.getPaddingRight()
+                    - content.getPaddingLeft() - content.getPaddingRight();
+            tvPrompt.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            int height = questionScroll.getHeight() - questionScroll.getPaddingTop() - questionScroll.getPaddingBottom()
+                    - content.getPaddingTop() - content.getPaddingBottom() - tvPrompt.getMeasuredHeight();
+            UiUtils.fitText(tvVisual,
+                    getResources().getDimension(R.dimen.class_visual_min_text),
+                    getResources().getDimension(R.dimen.class_visual_max_text),
+                    width, height);
+        }
+
+        if (mcGrid.getVisibility() == View.VISIBLE) {
+            float min = getResources().getDimension(R.dimen.class_option_min_text);
+            float max = getResources().getDimension(R.dimen.class_option_max_text);
+            int textHeightBudget = Integer.MAX_VALUE / 2;
+            if (tvVisual.getVisibility() != View.VISIBLE && questionScroll.getHeight() > 0) {
+                // "Which group has more?": the buttons ARE the picture, so let them grow into the empty middle.
+                // Scroll + grid height stays constant while the buttons grow, so this budget is stable.
+                View content = questionScroll.getChildAt(0);
+                int width = questionScroll.getWidth() - content.getPaddingLeft() - content.getPaddingRight();
+                tvPrompt.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                int free = questionScroll.getHeight() + mcGrid.getHeight()
+                        - content.getPaddingTop() - content.getPaddingBottom() - tvPrompt.getMeasuredHeight();
+                Button b0 = optionButtons[0];
+                textHeightBudget = free / optionButtons.length - b0.getTotalPaddingTop() - b0.getTotalPaddingBottom()
+                        - Math.round(16 * getResources().getDisplayMetrics().density);
+                max = getResources().getDimension(R.dimen.class_visual_max_text) * 0.6f;
+            }
+            float common = max;
+            for (Button b : optionButtons) {
+                int w = b.getWidth() - b.getTotalPaddingLeft() - b.getTotalPaddingRight();
+                if (w <= 0) return;                    // not laid out yet; the layout listener will call again
+                b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, max);
+                UiUtils.fitText(b, min, max, w, textHeightBudget);
+                common = Math.min(common, b.getTextSize());
+            }
+            for (Button b : optionButtons) b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, common);
+        }
+    }
+
+    /**
+     * Fruit-group options get one full-width row each (A, B, C, D stacked) so the fruit can be large;
+     * number/word options keep the 2x2 grid.
+     */
+    private void stackOptions(boolean stacked) {
+        int gap = Math.round(6 * getResources().getDisplayMetrics().density);
+        ViewGroup grid = (ViewGroup) mcGrid;
+        for (int r = 0; r < grid.getChildCount(); r++) {
+            LinearLayout row = (LinearLayout) grid.getChildAt(r);
+            row.setOrientation(stacked ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+            for (int c = 0; c < row.getChildCount(); c++) {
+                View b = row.getChildAt(c);
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) b.getLayoutParams();
+                lp.width = stacked ? LinearLayout.LayoutParams.MATCH_PARENT : 0;
+                lp.weight = stacked ? 0 : 1;
+                lp.setMarginStart(!stacked && c == 1 ? gap : 0);
+                lp.setMarginEnd(!stacked && c == 0 ? gap : 0);
+                b.setLayoutParams(lp);
+            }
+        }
     }
 
     private void onReveal() {

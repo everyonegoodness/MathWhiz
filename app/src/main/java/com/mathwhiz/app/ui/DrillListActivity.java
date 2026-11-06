@@ -166,6 +166,8 @@ public class DrillListActivity extends AppCompatActivity {
         if (section.startsWith("Kinder - ")) section = section.substring("Kinder - ".length()).trim();
         if (section.startsWith("Kindergarten - ")) section = section.substring("Kindergarten - ".length()).trim();
         if (section.startsWith(prefix)) section = section.substring(prefix.length()).trim();
+        String hyphenPrefix = Grade.label(drill.grade) + " - ";            // how CreateDrillActivity saves it
+        if (section.startsWith(hyphenPrefix)) section = section.substring(hyphenPrefix.length()).trim();
         return section.isEmpty() ? "Unspecified section" : section;
     }
 

@@ -8,7 +8,11 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="24dp"
+        android:paddingStart="@dimen/screen_gutter"
+        android:paddingTop="24dp"
+        android:paddingEnd="@dimen/screen_gutter"
+        android:paddingBottom="24dp"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
@@ -80,7 +84,7 @@
                 android:id="@+id/tvFactEmoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="56sp" />
+                android:textSize="@dimen/results_fact_emoji" />
 
             <TextView
                 android:id="@+id/tvFact"
