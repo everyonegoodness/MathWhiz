@@ -57,3 +57,13 @@ Frontend → `ui/` + `res/layout` • Backend → `data/`, `logic/`, `database.r
 * **PERMISSION_DENIED** → rules not published, or signed out. Re-publish `database.rules.json`.
 * **Dashboard loads forever offline** → times out after 12 s with a retry button; data cached from earlier online use may not show.
 * **Query needs index warning in Logcat** → publish the rules (they contain `.indexOn`).
+* 
+## Download MathWhiz
+
+[Download MathWhiz v1.0.0](https://github.com/everyonegoodness/MathWhiz/releases/tag/v1.0.0)
+
+### Installation
+1. Download the APK.
+2. Open the downloaded file on your Android device.
+3. Allow installation from unknown sources if prompted.
+4. Install MathWhiz.
