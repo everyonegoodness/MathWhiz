@@ -39,7 +39,10 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingStart="@dimen/screen_gutter"
+            android:paddingTop="24dp"
+            android:paddingEnd="@dimen/screen_gutter"
+            android:paddingBottom="24dp">
 
             <LinearLayout
                 android:layout_width="match_parent"

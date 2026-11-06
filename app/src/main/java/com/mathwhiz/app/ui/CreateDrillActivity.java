@@ -43,6 +43,7 @@ public class CreateDrillActivity extends AppCompatActivity {
     private Button btnSave;
     private ProgressBar progress;
     private final List<Skill> skills = new ArrayList<>();
+    private String loadedGrade;
     private Drill editingDrill;
     private String editingDrillId;
 
@@ -94,6 +95,10 @@ public class CreateDrillActivity extends AppCompatActivity {
 
     /** Only the chosen grade's skills are listed, so Kinder never shows Grade 1 content. */
     private void loadSkillsFor(String grade) {
+        // The spinner reports its selection again after the first layout. Without this check that late
+        // callback rebuilt the list and reset the skill to the first one when editing a saved drill.
+        if (grade.equals(loadedGrade)) return;
+        loadedGrade = grade;
         skills.clear();
         skills.addAll(CurriculumGuide.forGrade(grade));
         List<String> titles = new ArrayList<>();

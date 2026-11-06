@@ -47,7 +47,7 @@ public final class FruitRainView extends View {
         super.onDraw(canvas);
         long elapsed = System.currentTimeMillis() - startedAt;
         float progress = Math.min(1f, elapsed / (float) DURATION_MS);
-        paint.setTextSize(34f * getResources().getDisplayMetrics().scaledDensity);
+        paint.setTextSize(getResources().getDimension(com.mathwhiz.app.R.dimen.fruit_rain_text));
         paint.setTextAlign(Paint.Align.CENTER);
         for (Drop drop : drops) {
             float y = (drop.startY + progress * (1.25f + drop.speed)) * getHeight();
